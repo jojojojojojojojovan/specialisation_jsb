@@ -33,7 +33,6 @@ public class Account {
     @Column(nullable = false)
     private int status;
 
-    @JsonIgnore
     @ManyToMany(cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
     @JoinTable(
         name = "account_group",

@@ -1,6 +1,8 @@
 package com.tmsapp.tms.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.persistence.NoResultException;
 
@@ -11,11 +13,11 @@ import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tmsapp.tms.Entity.Accgroup;
 import com.tmsapp.tms.Entity.Account;
+import com.tmsapp.tms.Entity.AccountDTO;
 import com.tmsapp.tms.Util.HibernateUtil;
-
-import javassist.NotFoundException;
 
 @Repository
 public class AccountRepository {
@@ -72,7 +74,7 @@ public class AccountRepository {
                 transaction.rollback();
 
             }
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }finally{
             if(session != null){
                 session.close();
@@ -148,6 +150,44 @@ public class AccountRepository {
         }
 
         return groups;
+    }
+
+    public List<AccountDTO> getAllAccounts(){
+        Transaction transaction = null;
+        List<Account> accounts = null;
+        List<AccountDTO> returnAccounts = new ArrayList<>();
+        try{
+            session = hibernateUtil.getSessionFactory().openSession();
+            transaction =session.beginTransaction();
+            String hql = "FROM com.tmsapp.tms.Entity.Account";
+            Query<Account> query = session.createQuery(hql, Account.class);
+            accounts = query.list();
+
+            for (Account acc : accounts) {
+                Hibernate.initialize(acc);
+                List<Accgroup> tempaccgroup = acc.getAccgroups();
+                System.out.println(tempaccgroup);
+                AccountDTO tempAcc = new AccountDTO(acc.getUsername(), acc.getPassword(), acc.getEmail(), acc.getStatus(), acc.getAccgroups());
+                returnAccounts.add(tempAcc);
+            }
+            transaction.commit();
+        }
+        catch(NoResultException e){
+            e.printStackTrace();
+        }
+        catch(Exception e){
+            if(transaction != null){
+                transaction.rollback();
+
+            }
+            e.printStackTrace();
+        }finally{
+            if(session != null){
+                session.close();
+            }
+        }
+
+        return returnAccounts;
     }
 
 }

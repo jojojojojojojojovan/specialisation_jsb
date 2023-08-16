@@ -1,9 +1,12 @@
 package com.tmsapp.tms.Service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tmsapp.tms.Entity.Accgroup;
 import com.tmsapp.tms.Entity.Account;
+import com.tmsapp.tms.Entity.AccountDTO;
 import com.tmsapp.tms.Entity.JwtInvalidation;
 import com.tmsapp.tms.Repository.AccountRepository;
 import com.tmsapp.tms.Repository.JwtRepository;
@@ -25,6 +28,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -39,21 +43,41 @@ public class AccountService {
     @Autowired
     JwtRepository jwtRepository;
 
+    @Autowired
+    private ObjectMapper objectMapper;
 
-    public Map<String, Object> createAccount(Account account){
+    @Autowired
+    private Checkgroup checkgroup;
+
+
+    public Map<String, Object> createAccount(Map<String, Object> req){
         Map<String, Object> result = new HashMap<>(); 
 
-        //Check all fields
-        if(account.getUsername() == null || account.getPassword() == null){
-            result.put("success", false);
-            result.put("message", "Required fields missing");
-            return result;
-        }
+        //Create account
+        try {
+            Account account = objectMapper.readValue(objectMapper.writeValueAsString(req.get("account")), Account.class);
+            //Check all fields
+            if(account.getUsername() == null || account.getPassword() == null){
+                result.put("success", false);
+                result.put("message", "Required fields missing");
+                return result;
+            }
 
-        //Password regex 
-        String passwordRegex = "^(?=.*[0-9])(?=.*[@#$%^&+=!])(?=\\S+$).{8,10}$";
-        
-        if(account.getPassword().matches(passwordRegex)){
+            //Password regex 
+            String passwordRegex = "^(?=.*[0-9])(?=.*[@#$%^&+=!])(?=\\S+$).{8,10}$";
+            String emailPattern = "^[A-Za-z0-9+_.-]+@([A-Za-z0-9.-]+\\.[A-Za-z]{2,})$";
+
+            //Email regex
+            if(account.getEmail() == null || !account.getEmail().matches(emailPattern)){
+                result.put("success",false);
+                return result;
+            }
+
+            //Password regex
+            if(!account.getPassword().toString().matches(passwordRegex)){
+                result.put("success", false);
+                return result;
+            }
             //Bcrypt password
             account.setPassword(passwordEncoder.encode(account.getPassword()));
 
@@ -66,45 +90,132 @@ public class AccountService {
             else{
                 result.put("success", false);
             }
-        }
-        else{
-            result.put("success", false);
-        }
 
-        return result;
+            return result;
+
+        } catch (JsonMappingException e) {
+            e.printStackTrace();
+            result.put("success", false);
+            return result;
+        } catch (JsonProcessingException e) {
+
+            e.printStackTrace();
+            result.put("success", false);
+            return result;
+        }
+        
+
+    }
+
+    public Map<String, Object> adminUpdateAccount(Map<String, Object> req) {
+        Map<String, Object> res = new HashMap<>();
+        System.out.println("this was ran");
+        System.out.println(req.get("un"));
+        System.out.println(req.get("gn"));
+        try {
+            boolean checkGroup = checkgroup.checkgroup((String) req.get("un"), (String) req.get("gn"));
+            System.out.println(checkGroup);
+            if(!checkGroup) {
+                res.put("success", false);
+                res.put("message", "unauthorized");
+                return res;
+            }
+        }
+        catch(Exception e) {
+            System.err.println(e.getMessage());
+        }
+        
+        //validate email and password
+        String passwordRegex = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[^a-zA-Z\\d]).{8,10}$";
+        String emailRegex = "^\\S+@\\S+\\.\\S+$";
+        
+        Account newAccount = new Account();
+        try {
+            //converts java Object to json object to be converted to Account entity
+            newAccount = objectMapper.readValue(objectMapper.writeValueAsString(req.get("account")), Account.class);
+            
+            String password = newAccount.getPassword();
+            String email = newAccount.getEmail();
+
+            System.out.println(password + email);
+            if(password != null) {
+                System.out.println(password);
+                if(!Pattern.matches(passwordRegex, password)) {
+                    res.put("success", false);
+                    res.put("message", "invalid password");
+                    return res;
+                } else {
+                    newAccount.setPassword(passwordEncoder.encode(newAccount.getPassword()));
+                }
+            }
+            if(email != null) {
+                if(!Pattern.matches(emailRegex, email)) {
+                    res.put("success", false);
+                    res.put("message", "invalid email");
+                return res;
+                }
+            }
+            
+            
+            int status = newAccount.getStatus();
+            if(status != 0 && status != 1) {
+                res.put("success", false);
+                res.put("message", "invalid status");
+                return res;
+            }
+            accountRepository.updateAccount(newAccount);
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+            res.put("success", false);
+            res.put("message", "unable to update user");
+            return res;
+        }
+        res.put("success", true);
+        return res;
     }
 
     // public Map<String, Object> login(Map<String, Object> req){
     //     Map<String, Object> result = new HashMap<>();
+    public Map<String, Object> getAllAccounts(Map<String, Object> req){
+        Map<String, Object> result = new HashMap<>();
+        boolean isAdmin = checkgroup.checkgroup(req.get("un").toString(), req.get("gn").toString());
+        if(!isAdmin) {
+            result.put("Success", false);
+            return result;
+        }
+        List<AccountDTO> accountList = accountRepository.getAllAccounts();
+        result.put("success", true);
+        result.put("accounts", accountList);
+        return result;
+    }
 
-    //     //Check if username and password is in the request
-    //     if(req.get("username").toString() == null && req.get("password").toString() == null){
-    //         result.put("success", false);
-    //         return result;
-    //     }
+    public Map<String, Object> updateAccount(Map<String, Object> req){
+        Map<String, Object> result = new HashMap<>();
+        //Get account 
+        Account account = accountRepository.getAccountByUsername(req.get("username").toString());
+        if(account == null){
+            result.put("success", false);
+            return result;
+        }
 
-    //     result.put("success", true);
-    //     return result;
-    // } 
+        //Authenticate 
+        if (!passwordEncoder.matches(req.get("verifyPassword").toString(), account.getPassword())){
+            result.put("success", false);
+            return result;
+        }
 
-    // public Map<String, Object> logout(HttpServletResponse response, HttpServletRequest request){
-    //     Map<String, Object> result = new HashMap<>();
+        //Update account 
+        if(req.get("email")!= null){
+            account.setEmail(req.get("email").toString());
+        }
+        if(req.get("newPassword") != null){
+            account.setPassword(passwordEncoder.encode(req.get("newPassword").toString()));
+        }
+        
+        boolean isUpdated = accountRepository.updateAccount(account);
+        result.put("success", isUpdated);
+        return result;
+    }
 
-    //     //Add JWT into the db
-    //     Cookie[] cookies = request.getCookies();
-    //     for (Cookie cookie : cookies) {
-    //         if("authToken".equals(cookie.getValue())){
-    //             JwtInvalidation jwt = new JwtInvalidation(cookie.getValue());
-    //             boolean jwtResult = jwtRepository.InvalidateJWT(jwt);
-    //             if(jwtResult){
-    //                 result.put("success", true);
-    //             }else{
-    //                 result.put("success", false);
-    //             }
-    //         }
-    //     }
-
-    //     return result;
-
-    // }
 }
