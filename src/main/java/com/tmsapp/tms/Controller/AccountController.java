@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+
 import com.tmsapp.tms.Entity.Account;
 import com.tmsapp.tms.Service.AccountService;
 
@@ -45,8 +46,26 @@ public class AccountController {
 
         //Call account service method
         result = accountService.adminUpdateAccount(req);
-        
+            
+    
+    
         return ResponseEntity.status(HttpStatus.OK).body(result);
+    }
+
+    //INPUT: authTokenC
+    @PostMapping(path = "/getUserProfile")
+    public ResponseEntity<Map<String, Object>> getUserProfile(@RequestBody Map<String, Object> req) {
+        Map<String, Object> result = accountService.getUserProfile(req);
+        
+        return ResponseEntity.ok(result);
+    }
+
+    //INPUT: username, un, gn
+    @PostMapping(path = "/admin/getUserProfile")
+    public ResponseEntity<Map<String, Object>> adminGetUserProfile(@RequestBody Map<String, Object> req) {
+        Map<String, Object> result = accountService.adminGetUserProfile(req);
+        
+        return ResponseEntity.ok(result);
     }
 
     //INPUT: username
