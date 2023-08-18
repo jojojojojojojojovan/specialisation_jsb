@@ -67,13 +67,11 @@ public class AccountRepository {
             session = hibernateUtil.getSessionFactory().openSession();
             transaction =session.beginTransaction();
             session.update(account);
-            
             result = true;
             transaction.commit();
         }catch(Exception e){
             if(transaction != null){
                 transaction.rollback();
-
             }
             System.out.println(e.getMessage());
         }finally{
@@ -127,14 +125,15 @@ public class AccountRepository {
         try{
             session = hibernateUtil.getSessionFactory().openSession();
             transaction =session.beginTransaction();
-            String hql = "FROM com.tmsapp.tms.Entity.Account WHERE username=:un";
-            Query<Account> query = session.createQuery(hql, Account.class);
+            String hql = "SELECT ag FROM Accgroup ag JOIN ag.accounts acc WHERE acc.username = :un";
+            Query<Accgroup> query = session.createQuery(hql, Accgroup.class);
             query.setParameter("un", username);
-            account = query.getSingleResult();
-            if(account != null){
-                Hibernate.initialize(account.getAccgroups());
-                groups = account.getAccgroups();
-            }
+            
+            groups = query.getResultList();
+            // if(account != null){
+            //     // Hibernate.initialize(account.getAccgroups());
+            //     groups = account.getAccgroups();
+            // }
             transaction.commit();
         }
         catch(NoResultException e){
@@ -168,10 +167,12 @@ public class AccountRepository {
             accounts = query.list();
 
             for (Account acc : accounts) {
-                Hibernate.initialize(acc);
-                List<Accgroup> tempaccgroup = acc.getAccgroups();
+                String hql2 = "SELECT ag FROM Accgroup ag JOIN ag.accounts acc WHERE acc.username = :un";
+                Query<Accgroup> query2 = session.createQuery(hql2, Accgroup.class);
+                query2.setParameter("un", acc.getUsername());
+                List<Accgroup> tempaccgroup = query2.getResultList();
                 System.out.println(tempaccgroup);
-                AccountDTO tempAcc = new AccountDTO(acc.getUsername(), acc.getPassword(), acc.getEmail(), acc.getStatus(), acc.getAccgroups());
+                AccountDTO tempAcc = new AccountDTO(acc.getUsername(), acc.getPassword(), acc.getEmail(), acc.getStatus(), tempaccgroup);
                 returnAccounts.add(tempAcc);
             }
             transaction.commit();

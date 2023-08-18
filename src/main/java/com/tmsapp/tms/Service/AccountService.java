@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tmsapp.tms.Entity.Accgroup;
 import com.tmsapp.tms.Entity.Account;
 import com.tmsapp.tms.Entity.AccountDTO;
+import com.tmsapp.tms.Entity.Application;
 import com.tmsapp.tms.Entity.JwtInvalidation;
 import com.tmsapp.tms.Repository.AccountRepository;
 import com.tmsapp.tms.Repository.JwtRepository;
@@ -60,7 +61,12 @@ public class AccountService {
         
         //Create account
         try {
-            Account account = objectMapper.readValue(objectMapper.writeValueAsString(req.get("account")), Account.class);
+            System.out.println("1\n");
+            // objectMapper.readValue(objectMapper.writeValueAsString(applicationObj.get("application")), Application.class);
+            Object accountObj = req.get("account");
+            Account account = objectMapper.readValue(objectMapper.writeValueAsString(accountObj), Account.class);
+            System.out.println(account);
+            
             //Check all fields
             if(account.getUsername() == null || account.getPassword() == null){
                 result.put("success", false);
@@ -73,14 +79,18 @@ public class AccountService {
             String emailPattern = "^[A-Za-z0-9+_.-]+@([A-Za-z0-9.-]+\\.[A-Za-z]{2,})$";
 
             //Email regex
-            if(account.getEmail() == null || !account.getEmail().matches(emailPattern)){
-                result.put("success",false);
-                return result;
+            if(account.getEmail() != null && !account.getEmail().equals("")) {
+                if(!account.getEmail().matches(emailPattern)){
+                    result.put("success",false);
+                    result.put("message", "email format invalid");
+                    return result;
+                }
             }
 
             //Password regex
-            if(!account.getPassword().toString().matches(passwordRegex)){
+            if(account.getPassword() == null || !account.getPassword().toString().matches(passwordRegex)){
                 result.put("success", false);
+                result.put("message", "password format invalid");
                 return result;
             }
             //Bcrypt password
@@ -114,9 +124,6 @@ public class AccountService {
 
     public Map<String, Object> adminUpdateAccount(Map<String, Object> req) {
         Map<String, Object> res = new HashMap<>();
-        System.out.println("this was ran");
-        System.out.println(req.get("un"));
-        System.out.println(req.get("gn"));
         try {
             boolean checkGroup = checkgroup.checkgroup((String) req.get("un"), (String) req.get("gn"));
             System.out.println(checkGroup);
@@ -135,15 +142,14 @@ public class AccountService {
         String emailRegex = "^\\S+@\\S+\\.\\S+$";
         
         Account newAccount = new Account();
+        Account currAccount = accountRepository.getAccountByUsername((String) req.get("un"));
         try {
             //converts java Object to json object to be converted to Account entity
             newAccount = objectMapper.readValue(objectMapper.writeValueAsString(req.get("account")), Account.class);
             String password = newAccount.getPassword();
             String email = newAccount.getEmail();
 
-            System.out.println(password + email);
             if(password != null) {
-                System.out.println(password);
                 if(!Pattern.matches(passwordRegex, password)) {
                     res.put("success", false);
                     res.put("message", "invalid password");
@@ -152,14 +158,16 @@ public class AccountService {
                     newAccount.setPassword(passwordEncoder.encode(newAccount.getPassword()));
                 }
             }
-            if(email != null) {
+            else {
+                newAccount.setPassword(currAccount.getPassword());
+            }
+            if(email != null && !email.equals("")) {
                 if(!Pattern.matches(emailRegex, email)) {
                     res.put("success", false);
                     res.put("message", "invalid email");
                 return res;
                 }
             }
-            
             
             int status = newAccount.getStatus();
             if(status != 0 && status != 1) {
@@ -216,8 +224,8 @@ public class AccountService {
             //use token get username
             Account editedAccount = accountRepository.getAccountByUsername(req.get("username").toString());
             
-            boolean isadmin = checkgroup.checkgroup(req.get("un").toString(), req.get("gn").toString());
-            if (isadmin){
+            boolean checkGroup = checkgroup.checkgroup(req.get("un").toString(), req.get("gn").toString());
+            if (checkGroup){
                 res = objectMapper.convertValue(editedAccount, Map.class);
                 res.put("success",true);
                 System.out.println(res);
@@ -246,6 +254,7 @@ public class AccountService {
             return result;
         }
         List<AccountDTO> accountList = accountRepository.getAllAccounts();
+        
         result.put("success", true);
         result.put("accounts", accountList);
         return result;
@@ -257,25 +266,30 @@ public class AccountService {
         Account account = accountRepository.getAccountByUsername(req.get("username").toString());
         if(account == null){
             result.put("success", false);
+            result.put("message", "Cannot find username");
             return result;
         }
 
         //Authenticate 
-        if (!passwordEncoder.matches(req.get("verifyPassword").toString(), account.getPassword())){
+        if (!passwordEncoder.matches((req.get("verifyPassword")).toString(), account.getPassword())){
             result.put("success", false);
+            result.put("message", "Wrong old password");
             return result;
         }
-
+        
         //Update account 
         if(req.get("email")!= null){
             account.setEmail(req.get("email").toString());
         }
+
         if(req.get("newPassword") != null){
             account.setPassword(passwordEncoder.encode(req.get("newPassword").toString()));
         }
-        
         boolean isUpdated = accountRepository.updateAccount(account);
         result.put("success", isUpdated);
+        if (!isUpdated){
+            result.put("message","Unable to update account");
+        }
         return result;
     }
 
