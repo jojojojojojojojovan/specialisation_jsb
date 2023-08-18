@@ -92,42 +92,10 @@ public class AccgroupService {
             result.put("success", false);
             result.put("groups", groupResult);
             return result;
-            // else{
-            //     dtoList.add(new AccgroupDTO("Permission Denied"));
-            // }
         } catch (Exception e) {
             System.err.println(e);
         }
         return result;
     }
 
-    // public List<String> getAllUserGroupDTO(Map<String, Object> req) {
-    //     List<AccgroupDTO> dtoList = new ArrayList<>();
-    //     boolean user = checkgroup.checkgroup(req.get("un").toString(), req.get("gn").toString());
-    //     Boolean getAgResult = false;
-    //     System.out.println(" user success " + user );
-
-    //     List<String> groupResult = new ArrayList<>();
-    //     try {
-    //         if (user) {
-    //             List<Accgroup> accgroups = accGroupRepository.getAllAccGroup();
-    //             groupResult = accgroups.stream().map(Accgroup::getGroupName).toList();
-    //             if (accgroups != null) {
-    //                 for (Accgroup accgroup : accgroups) {
-    //                     dtoList.add(new AccgroupDTO(accgroup.getGroupName()));
-    //                 }
-
-    //             }
-    //             else{
-    //                 dtoList.add(new AccgroupDTO("No group created"));
-    //             }
-    //         }
-    //         else{
-    //             dtoList.add(new AccgroupDTO("Permission Denied"));
-    //         }
-    //     } catch (Exception e) {
-    //         System.err.println(e);
-    //     }
-    //     return groupResult;
-    // }
 }

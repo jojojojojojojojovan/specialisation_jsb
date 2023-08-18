@@ -39,14 +39,6 @@ public class AccgroupController {
         Map<String, Object> result = new HashMap<>();
         result.putAll(accGroupService.getAllUserGroupDTO(req));
         return ResponseEntity.status(HttpStatus.OK).body(result);
-        // List<String> dtoList = accGroupService.getAllUserGroupDTO(req);
-        // return ResponseEntity.status(HttpStatus.OK).body(dtoList);
     }
-
-    // @PostMapping(path = "/getAllGroups")
-    // public ResponseEntity<List<String>> getAllGroups(@RequestBody Map<String, Object> req) {
-    //     List<String> dtoList = accGroupService.getAllUserGroupDTO(req);
-    //     return ResponseEntity.status(HttpStatus.OK).body(dtoList);
-    // }
 
 }
