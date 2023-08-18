@@ -10,7 +10,11 @@ import com.tmsapp.tms.Entity.AccountDTO;
 import com.tmsapp.tms.Entity.JwtInvalidation;
 import com.tmsapp.tms.Repository.AccountRepository;
 import com.tmsapp.tms.Repository.JwtRepository;
+import com.tmsapp.tms.Util.ApplicationConstant;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -23,6 +27,7 @@ import org.springframework.security.web.authentication.logout.SecurityContextLog
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -52,7 +57,7 @@ public class AccountService {
 
     public Map<String, Object> createAccount(Map<String, Object> req){
         Map<String, Object> result = new HashMap<>(); 
-
+        
         //Create account
         try {
             Account account = objectMapper.readValue(objectMapper.writeValueAsString(req.get("account")), Account.class);
@@ -133,7 +138,6 @@ public class AccountService {
         try {
             //converts java Object to json object to be converted to Account entity
             newAccount = objectMapper.readValue(objectMapper.writeValueAsString(req.get("account")), Account.class);
-            
             String password = newAccount.getPassword();
             String email = newAccount.getEmail();
 
@@ -174,6 +178,63 @@ public class AccountService {
         res.put("success", true);
         return res;
     }
+
+    public Map<String, Object> getUserProfile(Map<String, Object> req){
+        Map<String, Object> res = new HashMap<>();
+        ObjectMapper objectMapper = new ObjectMapper();
+        String username = req.get("un").toString();
+        // if(jwtToken == null) {
+        //     res.put("success", false);
+        //     res.put("message", "invalid token");
+        //     return res;
+        // }
+        try{
+            //use token get username
+            // Jws<Claims> jwtContents = Jwts.parserBuilder()
+            //     .setSigningKey(ApplicationConstant.SECURITY_KEY.getBytes(StandardCharsets.UTF_8))
+            //     .build()
+            //     .parseClaimsJws(jwtToken);
+            // String username = jwtContents.getBody().getSubject();
+            Account account = accountRepository.getAccountByUsername(username);
+            res = objectMapper.convertValue(account, Map.class);
+            res.remove("status");
+            res.put("success",true);
+            System.out.println(res);
+            return res;
+        } catch (Exception e){
+            System.err.println(e);
+            res.put("success",false);
+        }
+        return res;
+    }
+    
+    public Map<String, Object> adminGetUserProfile(Map<String, Object> req){
+        Map<String, Object> res = new HashMap<>();
+        ObjectMapper objectMapper = new ObjectMapper();
+    
+        try{
+            //use token get username
+            Account editedAccount = accountRepository.getAccountByUsername(req.get("username").toString());
+            
+            boolean isadmin = checkgroup.checkgroup(req.get("un").toString(), req.get("gn").toString());
+            if (isadmin){
+                res = objectMapper.convertValue(editedAccount, Map.class);
+                res.put("success",true);
+                System.out.println(res);
+            }
+            else{
+                res.put("success",false);
+                res.put("message","User is not authorised");
+            }
+            return res;
+        } catch (Exception e){
+            System.err.println(e);
+            res.put("success",false);
+        }
+        return res;
+    }
+
+
 
     // public Map<String, Object> login(Map<String, Object> req){
     //     Map<String, Object> result = new HashMap<>();

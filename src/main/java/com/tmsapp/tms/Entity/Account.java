@@ -2,6 +2,7 @@ package com.tmsapp.tms.Entity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -45,6 +46,8 @@ public class Account {
     )
     List<Accgroup> accgroups = new ArrayList<Accgroup>();
 
+  
+
     @JsonCreator
     public Account(@JsonProperty("username") String username, @JsonProperty("password") String password, @JsonProperty("status") int status,@JsonProperty("email")  String email, @JsonProperty("groups")List<Accgroup> accgroups) {
         this.username = username;
@@ -67,6 +70,7 @@ public class Account {
         this.username = username;
     }
 
+    @JsonIgnore
     public String getPassword() {
         return password;
     }
@@ -90,13 +94,21 @@ public class Account {
     public void setStatus(int status) {
         this.status = status;
     }
-
+    
+    @JsonIgnore
     public List<Accgroup> getAccgroups() {
         return accgroups;
+    }
+
+    @JsonProperty("groups")
+    public List<String> getAccgroupsString() {
+        List<String> accgroupsString = this.getAccgroups().stream()
+                .map(Accgroup::getGroupName)
+                .collect(Collectors.toList());
+        return accgroupsString;
     }
 
     public void setAccgroups(List<Accgroup> accgroups) {
         this.accgroups = accgroups;
     }
-
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.persistence.NoResultException;
+import javax.persistence.TypedQuery;
 
 import org.hibernate.Hibernate;
 import org.hibernate.Query;
@@ -90,11 +91,14 @@ public class AccountRepository {
         try{
             session = hibernateUtil.getSessionFactory().openSession();
             transaction =session.beginTransaction();
-            String hql = "FROM com.tmsapp.tms.Entity.Account WHERE username=:un";
+            String hql = "FROM Account WHERE username=:un";
             Query<Account> query = session.createQuery(hql, Account.class);
             query.setParameter("un", username);
+            System.out.println(username);
             account = query.getSingleResult();
-
+            if(account != null){
+                Hibernate.initialize(account.getAccgroups());
+            }
             transaction.commit();
         }
         catch(NoResultException e){
