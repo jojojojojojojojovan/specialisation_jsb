@@ -104,6 +104,7 @@ public class AccountService {
             }
             else{
                 result.put("success", false);
+                result.put("message", "account exist in database");
             }
 
             return result;
@@ -276,15 +277,32 @@ public class AccountService {
             result.put("message", "Wrong old password");
             return result;
         }
+
+        //validate email and password
+        String passwordRegex = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[^a-zA-Z\\d]).{8,10}$";
+        String emailRegex = "^\\S+@\\S+\\.\\S+$";
         
         //Update account 
         if(req.get("email")!= null){
-            account.setEmail(req.get("email").toString());
+            String email = req.get("email").toString();
+            if(!Pattern.matches(emailRegex, email) && email != "") {
+                result.put("success", false);
+                result.put("message", "invalid email");
+                return result;
+            }
+            account.setEmail(email.toString());
         }
 
         if(req.get("newPassword") != null){
-            account.setPassword(passwordEncoder.encode(req.get("newPassword").toString()));
+            String password = req.get("newPassword").toString();
+            if(!Pattern.matches(passwordRegex, password)) {
+                result.put("success", false);
+                result.put("message", "invalid password");
+                return result;
+            }
+            account.setPassword(passwordEncoder.encode(password.toString()));
         }
+
         boolean isUpdated = accountRepository.updateAccount(account);
         result.put("success", isUpdated);
         if (!isUpdated){

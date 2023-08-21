@@ -94,7 +94,7 @@ public class AccountController {
         return ResponseEntity.ok(result);
     }
 
-    //INPUT: username, un, gn
+    //INPUT: username, un, gn="admin"
     @PostMapping(path = "/admin/getUserProfile")
     public ResponseEntity<Map<String, Object>> adminGetUserProfile(@RequestBody Map<String, Object> req) {
         Map<String, Object> result = accountService.adminGetUserProfile(req);
