@@ -243,8 +243,13 @@ public class TaskService {
         //Get application and Task
         Application application;
         Plan plan;
-        try{
-            TaskDTO task = taskRepository.getTaskById(id);
+        TaskDTO task = taskRepository.getTaskById(id);
+
+        if(task == null){
+            response.put("success", false);
+            response.put("message", "Invalid task id");
+            return response;
+        } else{
             //task state not in open
             if(!task.getTaskState().toLowerCase().equals("open")){
                 response.put("success", false);
@@ -252,65 +257,58 @@ public class TaskService {
                 return response;
             }
             application = applicationRepository.getApplication(task.getTaskAppAcronym());
-            
+        }
 
-            //Check if plan exisit if req.get("taskPlan") != null
-            if(req.get("taskPlan") !=null){
-                plan = planRepository.getPlansByPlanName(req.get("taskPlan").toString());
-                if(plan == null){
-                    response.put("success", false);
-                    response.put("message", "No exisiting plan");
-                    return response;
-                }
-                task.setTaskPlan(plan.getPlan_MVP_name());
-            }else{
-                plan = planRepository.getPlansByPlanName(task.getTaskPlan());
-            }
-
-            //Get current date
-            Date date = new Date();
-            //System/User's notes
-            String systemNotes="",userNotes = "";
-
-            //task is being promoted
-            if(state.equals("todo")){
-                systemNotes = "||system|" + un + "|" + date.toInstant().toString() + "| Updated task state from open to todo";
-                task.setTaskState(state);
-            }
-
-            //there is new notes
-            if(req.get("userNotes") != null){
-                systemNotes += "||system|" + req.get("un").toString().toLowerCase() + "|" + date.toInstant().toString() + "| Updated task user notes||";
-                userNotes = req.get("un").toString() + "|" + task.getTaskState() + "|" + date.toInstant().toString()+ "|" + req.get("userNotes");
-            }
-            if(systemNotes != ""){
-                task.setTaskNotes(task.getTaskNotes().concat(systemNotes));
-            }
-            if(userNotes != ""){
-                task.setTaskNotes(task.getTaskNotes().concat(userNotes));
-            }
-
-            //Update task creator
-            task.setTaskOwner(un);
-
-            //update task
-            Task updateTask = new Task(task, application, plan);
-            boolean isUpdated = taskRepository.updateTask(updateTask);
-            //Return
-            if(isUpdated){
-                response.put("success", true);
+        //Check if plan exisit if req.get("taskPlan") != null
+        if(req.get("taskPlan") !=null){
+            plan = planRepository.getPlansByPlanName(req.get("taskPlan").toString());
+            if(plan == null){
+                response.put("success", false);
+                response.put("message", "No exisiting plan");
                 return response;
             }
+            task.setTaskPlan(plan.getPlan_MVP_name());
+        }else{
+            plan = planRepository.getPlansByPlanName(task.getTaskPlan());
+        }
 
-            response.put("success", false);
+        //Get current date
+        Date date = new Date();
+        //System/User's notes
+        String systemNotes="",userNotes = "";
+
+        //task is being promoted
+        if(state.equals("todo")){
+            systemNotes = "||system|" + un + "|" + date.toInstant().toString() + "| Updated task state from open to todo";
+            task.setTaskState(state);
+        }
+
+        //there is new notes
+        if(req.get("userNotes") != null){
+            systemNotes += "||system|" + req.get("un").toString().toLowerCase() + "|" + date.toInstant().toString() + "| Updated task user notes||";
+            userNotes = req.get("un").toString() + "|" + task.getTaskState() + "|" + date.toInstant().toString()+ "|" + req.get("userNotes");
+        }
+        if(systemNotes != ""){
+            task.setTaskNotes(task.getTaskNotes().concat(systemNotes));
+        }
+        if(userNotes != ""){
+            task.setTaskNotes(task.getTaskNotes().concat(userNotes));
+        }
+
+        //Update task creator
+        task.setTaskOwner(un);
+
+        //update task
+        Task updateTask = new Task(task, application, plan);
+        boolean isUpdated = taskRepository.updateTask(updateTask);
+        //Return
+        if(isUpdated){
+            response.put("success", true);
             return response;
-        } catch(Error err) {
-            response.put("success", false);
-            response.put("message", "No available task");
-            
-            System.out.println("LALALA");
-            return response;}
-               
+        }
+
+        response.put("success", false);
+        return response;
     }
 
     public Map<String, Object> PLEditTask (Map<String, Object> req){
@@ -402,7 +400,7 @@ public class TaskService {
     }
 
 
-    public Map<String, Object> TMEditTaskToDoToDoing (Map<String, Object> req){
+        public Map<String, Object> TMEditTaskToDoToDoing (Map<String, Object> req){
         Map<String, Object> response = new HashMap<>();
         //Check for required fields 
         if(req.get("taskId") == null || req.get("un") == null || req.get("gn") == null || req.get("taskState") == null || req.get("taskOwner") == null || req.get("acronym") == null){
@@ -423,7 +421,6 @@ public class TaskService {
         Application application = applicationRepository.getApplication(req.get("acronym").toString());
         TaskDTO task = taskRepository.getTaskById(req.get("taskId").toString());
         Plan newPlan = null;
-        
         if(application == null || task == null){
             response.put("success", false);
             response.put("message", "No available task/application");
@@ -459,16 +456,11 @@ public class TaskService {
             task.setTaskNotes(task.getTaskNotes().concat(userNotes));
         }
 
-        if(req.get("taskPlan") !=null){
-            newPlan = planRepository.getPlansByPlanName(req.get("taskPlan").toString());
-        }
-
         //Update task creator
         task.setTaskOwner(req.get("un").toString());
 
         //update task
         Task updateTask = new Task(task, application, newPlan);
-
         boolean isUpdated = taskRepository.updateTask(updateTask);
         
         //Return
@@ -535,10 +527,6 @@ public class TaskService {
         }
         if(userNotes != null){
             task.setTaskNotes(task.getTaskNotes().concat(userNotes));
-        }
-        
-        if(req.get("taskPlan") !=null){
-            newPlan = planRepository.getPlansByPlanName(req.get("taskPlan").toString());
         }
 
         //Update task creator
