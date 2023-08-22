@@ -75,8 +75,11 @@ public class TaskRepository {
                 session.close();
             }
         }
-
-        return new TaskDTO(task);
+        if (task == null){
+            return null;
+        }else{
+           return new TaskDTO(task);
+        }
     }
 
     public List<TaskDTO> getTasksByPlan(String taskPlan) {
