@@ -1,8 +1,11 @@
 package com.tmsapp.tms.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.persistence.NoResultException;
+import javax.persistence.TypedQuery;
 
 import org.hibernate.Hibernate;
 import org.hibernate.Query;
@@ -11,11 +14,11 @@ import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tmsapp.tms.Entity.Accgroup;
 import com.tmsapp.tms.Entity.Account;
+import com.tmsapp.tms.Entity.AccountDTO;
 import com.tmsapp.tms.Util.HibernateUtil;
-
-import javassist.NotFoundException;
 
 @Repository
 public class AccountRepository {
@@ -64,15 +67,13 @@ public class AccountRepository {
             session = hibernateUtil.getSessionFactory().openSession();
             transaction =session.beginTransaction();
             session.update(account);
-            
             result = true;
             transaction.commit();
         }catch(Exception e){
             if(transaction != null){
                 transaction.rollback();
-
             }
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }finally{
             if(session != null){
                 session.close();
@@ -88,11 +89,14 @@ public class AccountRepository {
         try{
             session = hibernateUtil.getSessionFactory().openSession();
             transaction =session.beginTransaction();
-            String hql = "FROM com.tmsapp.tms.Entity.Account WHERE username=:un";
+            String hql = "FROM Account WHERE username=:un";
             Query<Account> query = session.createQuery(hql, Account.class);
             query.setParameter("un", username);
+            System.out.println(username);
             account = query.getSingleResult();
-
+            if(account != null){
+                Hibernate.initialize(account.getAccgroups());
+            }
             transaction.commit();
         }
         catch(NoResultException e){
@@ -114,25 +118,55 @@ public class AccountRepository {
         return account;
     }
 
-    public List<Accgroup> getGroupsByUsername(String username){
+    public List<Accgroup> getGroupsByUsername(String username) {
+        List<Accgroup> groups = new ArrayList<>();
+        
+        try (Session session = hibernateUtil.getSessionFactory().openSession()) {
+            Transaction transaction = session.beginTransaction();
+            
+            String hql = "SELECT ag FROM Accgroup ag JOIN ag.accounts acc WHERE acc.username = :un";
+            Query<Accgroup> query = session.createQuery(hql, Accgroup.class);
+            query.setParameter("un", username);
+            
+            groups = query.getResultList();
+            System.out.println(username);
+            
+            transaction.commit();
+        } catch (NoResultException e) {
+            // Handle NoResultException
+            e.printStackTrace();
+        } catch (Exception e) {
+            // Handle other exceptions
+            e.printStackTrace();
+        }
+        
+        return groups;
+    }
+    
+
+    public List<AccountDTO> getAllAccounts(){
         Transaction transaction = null;
-        List<Accgroup> groups = null;
-        Account account = null;
+        List<Account> accounts = null;
+        List<AccountDTO> returnAccounts = new ArrayList<>();
         try{
             session = hibernateUtil.getSessionFactory().openSession();
             transaction =session.beginTransaction();
-            String hql = "FROM com.tmsapp.tms.Entity.Account WHERE username=:un";
+            String hql = "FROM com.tmsapp.tms.Entity.Account";
             Query<Account> query = session.createQuery(hql, Account.class);
-            query.setParameter("un", username);
-            account = query.getSingleResult();
-            if(account != null){
-                Hibernate.initialize(account.getAccgroups());
-                groups = account.getAccgroups();
+            accounts = query.list();
+
+            for (Account acc : accounts) {
+                String hql2 = "SELECT ag FROM Accgroup ag JOIN ag.accounts acc WHERE acc.username = :un";
+                Query<Accgroup> query2 = session.createQuery(hql2, Accgroup.class);
+                query2.setParameter("un", acc.getUsername());
+                List<Accgroup> tempaccgroup = query2.getResultList();
+                System.out.println(tempaccgroup);
+                AccountDTO tempAcc = new AccountDTO(acc.getUsername(), acc.getPassword(), acc.getEmail(), acc.getStatus(), tempaccgroup);
+                returnAccounts.add(tempAcc);
             }
             transaction.commit();
         }
         catch(NoResultException e){
-            account = null;
             e.printStackTrace();
         }
         catch(Exception e){
@@ -147,7 +181,7 @@ public class AccountRepository {
             }
         }
 
-        return groups;
+        return returnAccounts;
     }
 
 }

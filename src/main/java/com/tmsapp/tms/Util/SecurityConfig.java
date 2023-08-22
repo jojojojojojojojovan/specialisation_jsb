@@ -2,11 +2,12 @@ package com.tmsapp.tms.Util;
 
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
@@ -14,6 +15,11 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.tmsapp.tms.Entity.JwtInvalidation;
 import com.tmsapp.tms.Repository.JwtRepository;
@@ -50,6 +56,7 @@ public class SecurityConfig{
         authenticationFilter.setFilterProcessesUrl("/login");
         http
                 .csrf(csrf -> csrf.disable())
+                .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
                                 .requestMatchers("/api/accounts/*").permitAll()
                                 .anyRequest().authenticated()
@@ -80,5 +87,17 @@ public class SecurityConfig{
         return http.build();
     }
     
+   @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3030")); // Specify your allowed origins
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE")); // Specify your allowed HTTP methods
+        configuration.setAllowedHeaders(Arrays.asList("*")); // Specify your allowed headers
+        configuration.setAllowCredentials(true); // Allow cookies
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration); // Apply the configuration to all paths
+        return source;
+    }
     
+        
 }
