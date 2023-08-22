@@ -43,7 +43,7 @@ public class Application {
     private String App_permit_Open;
 
     @Column(nullable = true)
-    private String App_permit_toDoList;
+    private String App_permit_toDo;
 
     @Column(nullable = true)
     private String App_permit_Doing;
@@ -77,7 +77,7 @@ public class Application {
         App_endDate = app_endDate;
         App_permit_Create = app_permit_Create;
         App_permit_Open = app_permit_Open;
-        App_permit_toDoList = app_permit_toDoList;
+        App_permit_toDo = app_permit_toDoList;
         App_permit_Doing = app_permit_Doing;
         App_permit_Done = app_permit_Done;
     }
@@ -141,12 +141,12 @@ public class Application {
         App_permit_Open = app_permit_Open;
     }
 
-    public String getApp_permit_toDoList() {
-        return App_permit_toDoList;
+    public String getApp_permit_toDo() {
+        return App_permit_toDo;
     }
 
-    public void setApp_permit_toDoList(String app_permit_toDoList) {
-        App_permit_toDoList = app_permit_toDoList;
+    public void setApp_permit_toDo(String app_permit_toDo) {
+        App_permit_toDo = app_permit_toDo;
     }
 
     public String getApp_permit_Doing() {

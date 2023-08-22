@@ -30,7 +30,7 @@ public class ApplicationController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    //INPUT: un, gn, appAcronym, start date, end date, rnumber, description(OPTIONAL), create(OPTIONAL), open(OPTIONAL), toDo(OPTIONAL), doing(OPTIONAL), done(OPTIONAL)
+    //INPUT: un, gn, appAcronym, start date, end date, rnumber, description(OPTIONAL), create(OPTIONAL), open(OPTIONAL), todo(OPTIONAL), doing(OPTIONAL), done(OPTIONAL)
     @PostMapping("/createApplication")
     public ResponseEntity<Map<String, Object>> createApplication(@RequestBody Map<String, Object> req) {
         Map<String, Object> response = new HashMap<>();
@@ -39,7 +39,7 @@ public class ApplicationController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    //INPUT: un, gn, appAcronym, end date, create(OPTIONAL), open(OPTIONAL), toDo(OPTIONAL), doing(OPTIONAL), done(OPTIONAL)
+    //INPUT: un, gn, acronym, end date, create(OPTIONAL), open(OPTIONAL), todo(OPTIONAL), doing(OPTIONAL), done(OPTIONAL)
     @PostMapping("/updateApplication")
     public ResponseEntity<Map<String, Object>> updateApplication(@RequestBody Map<String, Object> req) throws ParseException {
         Map<String, Object> response = new HashMap<>();

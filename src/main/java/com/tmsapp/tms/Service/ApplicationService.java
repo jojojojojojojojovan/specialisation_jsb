@@ -47,7 +47,29 @@ public class ApplicationService {
         //Check for mandatory fields
         if(req.get("acronym") == null || req.get("rnumber") == null || req.get("startDate") == null || req.get("endDate") == null){
             result.put("success", false);
-            result.put("message", "no appacro/rnum/star/enddatee");
+            result.put("message", "missing madatory fields");
+            return result;
+        }
+
+        //Check date
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date checkStartDate = null;
+        Date checkEndDate = null;
+
+        try{
+            checkStartDate = dateFormat.parse(req.get("startDate").toString());
+            checkEndDate = dateFormat.parse(req.get("endDate").toString());
+            if(checkStartDate != null && checkEndDate != null){
+                int compareDateResult = checkStartDate.compareTo(checkEndDate);
+                if(compareDateResult > 0){
+                    result.put("success", false);
+                    result.put("message", "start date cannot be after the end date");
+                    return result;
+                }
+            }
+        }catch(ParseException e){
+            result.put("success", false);
+            result.put("message", "invalid date format");
             return result;
         }
 
@@ -63,8 +85,8 @@ public class ApplicationService {
                 open = tempgroup.getGroupName();
             }
         }
-        if(req.get("toDo") != null){
-            Accgroup tempgroup = accgroupRepository.getGroupByGroupName(req.get("toDo").toString());
+        if(req.get("todo") != null){
+            Accgroup tempgroup = accgroupRepository.getGroupByGroupName(req.get("todo").toString());
             if(tempgroup != null){
                 toDo = tempgroup.getGroupName();
             }
@@ -88,8 +110,17 @@ public class ApplicationService {
             }
         }
 
+        //Check r_number
+        String rNumberRegex = "^\\d+$";
+        if(!req.get("rnumber").toString().matches(rNumberRegex)){
+            result.put("success", false);
+            result.put("message", "incorrect rnumber");
+            return result;
+        }
+
+
         //Construct application
-        Application application = new Application(req.get("acronym").toString(), req.get("description").toString(), (int) req.get("rnumber"), (Date) req.get("startDate"), (Date) req.get("endDate"), create, open, toDo, doing, done);
+        Application application = new Application(req.get("acronym").toString(), req.get("description").toString(), (int) req.get("rnumber"), checkStartDate, checkEndDate, create, open, toDo, doing, done);
         Boolean isCreated = applicationRepository.createApplication(application) || false;
         if(isCreated){
             result.put("success", true);
@@ -138,9 +169,7 @@ public class ApplicationService {
             return result;
         }
         boolean isPL =  checkgroup.checkgroup(req.get("un").toString(), req.get("gn").toString());
-        System.out.println(" pl " + isPL);
-        if(!isPL){
-            
+        if(!isPL){ 
             result.put("message", "not pl");
             result.put("success", false);
             return result; 
@@ -148,17 +177,16 @@ public class ApplicationService {
         System.out.println(" application after pl  " + req.get("acronym").toString());
         //Retrieve application 
         Application application = applicationRepository.getApplication(req.get("acronym").toString());
-        System.out.println(" application after get application  " + application);
+
         if(application == null){
             result.put("success", false);
+            result.put("message", "no application found");
             return result;
         }
         //update application changes
         if(req.get("endDate") != null){
-            System.out.println("end date " + req.get("endDate"));
-            System.out.println("end date string" + req.get("endDate").toString());
-                String dateString = req.get("endDate").toString();
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            String dateString = req.get("endDate").toString();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             Date temp = dateFormat.parse(dateString);
 
             // Date temp = (Date) req.get("endDate");
@@ -177,47 +205,33 @@ public class ApplicationService {
             }
         }
         if(req.get("create") != null){
-            System.out.println("create " + req.get("create"));
-            String temp = req.get("create").toString();
+            Accgroup temp = accgroupRepository.getGroupByGroupName(req.get("create").toString());
             if(temp != null){
-                System.out.println(" temp " + temp);
-                application.setApp_permit_Create(temp);
+                application.setApp_permit_Create(temp.getGroupName());
             }
         }
         if(req.get("open") != null){
-            System.out.println("open " + req.get("open"));
-            String temp = req.get("open").toString();
+            Accgroup temp = accgroupRepository.getGroupByGroupName(req.get("open").toString());
             if(temp != null){
-                System.out.println(" temp " + temp);
-                // application.setApp_permit_Create(temp);
-                application.setApp_permit_Open(temp);
+                application.setApp_permit_Open(temp.getGroupName());
             }
         }
-        if(req.get("toDo") != null){
-            System.out.println("toDo " + req.get("toDo"));
-            String temp = req.get("toDo").toString();
+        if(req.get("todo") != null){
+            Accgroup temp = accgroupRepository.getGroupByGroupName(req.get("todo").toString());
             if(temp != null){
-                System.out.println(" temp " + temp);
-                // application.setApp_permit_Create(temp);
-                application.setApp_permit_toDoList(temp);
+                application.setApp_permit_toDo(temp.getGroupName());
             }
         }
         if(req.get("doing") != null){
-            System.out.println("doing " + req.get("doing"));
-            String temp = req.get("doing").toString();
+            Accgroup temp = accgroupRepository.getGroupByGroupName(req.get("doing").toString());
             if(temp != null){
-                System.out.println(" temp " + temp);
-                // application.setApp_permit_Create(temp);
-                application.setApp_permit_Doing(temp);
+                application.setApp_permit_Doing(temp.getGroupName());
             }
         }
         if(req.get("done") != null){
-            System.out.println("done " + req.get("done"));
-            String temp = req.get("done").toString();
+            Accgroup temp = accgroupRepository.getGroupByGroupName(req.get("done").toString());
             if(temp != null){
-                System.out.println(" temp " + temp);
-                // application.setApp_permit_Create(temp);
-                application.setApp_permit_Done(temp);
+                application.setApp_permit_Done(temp.getGroupName());
             }
         }
         // if(req.get("rnumber") != null){
