@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane.SystemMenuBar;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,22 +34,22 @@ public class ApplicationService {
         //Check if user is in Project leader group 
         if(req.get("un") == null || req.get("gn") == null){
             result.put("success", false);
+            result.put("message", "no un gn");
             return result;
         }
         boolean isPL =  checkgroup.checkgroup(req.get("un").toString(), req.get("gn").toString());
         if(!isPL){
             result.put("success", false);
+            result.put("message", "not pl");
             return result; 
         }
 
         //Check for mandatory fields
-        if(req.get("appAcronym") == null || req.get("rnumber") == null || req.get("startDate") == null || req.get("endDate") == null){
+        if(req.get("acronym") == null || req.get("rnumber") == null || req.get("startDate") == null || req.get("endDate") == null){
             result.put("success", false);
+            result.put("message", "no appacro/rnum/star/enddatee");
             return result;
         }
-
-        System.out.println(req.get("startDate"));
-        System.out.println(req.get("endDate"));
 
         //Validate permit groups
         String open = null;
@@ -86,29 +88,14 @@ public class ApplicationService {
             }
         }
 
-        //Start and end date
-        SimpleDateFormat dateTemplate = new SimpleDateFormat("yyyy-MM-dd");
-        Date startDate = null;
-        Date endDate = null;
-        try {
-            startDate = dateTemplate.parse(req.get("startDate").toString());
-            endDate = dateTemplate.parse(req.get("endDate").toString());
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        if(startDate == null || endDate == null){
-            result.put("success", false);
-            return result;
-        }
-
         //Construct application
-        Application application = new Application(req.get("appAcronym").toString(), req.get("description").toString(), (int) req.get("rnumber"), startDate, endDate, create, open, toDo, doing, done);
+        Application application = new Application(req.get("acronym").toString(), req.get("description").toString(), (int) req.get("rnumber"), (Date) req.get("startDate"), (Date) req.get("endDate"), create, open, toDo, doing, done);
         Boolean isCreated = applicationRepository.createApplication(application) || false;
         if(isCreated){
             result.put("success", true);
         }
         else{
+            result.put("message", "not created for some reason");
             result.put("success", false);
         }
 
@@ -141,28 +128,41 @@ public class ApplicationService {
         return result;
     }
 
-    public Map<String, Object> updateApplication(Map<String, Object> req){
+    public Map<String, Object> updateApplication(Map<String, Object> req) throws ParseException{
         Map<String, Object> result = new HashMap<>(); 
         //Check if user is in Project leader group 
+        
         if(req.get("un") == null || req.get("gn") == null){
             result.put("success", false);
+            result.put("message", "no un gn");
             return result;
         }
         boolean isPL =  checkgroup.checkgroup(req.get("un").toString(), req.get("gn").toString());
+        System.out.println(" pl " + isPL);
         if(!isPL){
+            
+            result.put("message", "not pl");
             result.put("success", false);
             return result; 
         }
-        
+        System.out.println(" application after pl  " + req.get("acronym").toString());
         //Retrieve application 
         Application application = applicationRepository.getApplication(req.get("acronym").toString());
+        System.out.println(" application after get application  " + application);
         if(application == null){
             result.put("success", false);
             return result;
         }
-        //Insert application changes
+        //update application changes
         if(req.get("endDate") != null){
-            Date temp = (Date) req.get("endDate");
+            System.out.println("end date " + req.get("endDate"));
+            System.out.println("end date string" + req.get("endDate").toString());
+                String dateString = req.get("endDate").toString();
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            Date temp = dateFormat.parse(dateString);
+
+            // Date temp = (Date) req.get("endDate");
+            System.out.println("temp " + temp);
             Date tempStartDate = application.getApp_startDate();
             int dateCompare = tempStartDate.compareTo(temp);
             //Start date is after end date
@@ -172,43 +172,58 @@ public class ApplicationService {
 
             }
             if(temp != null){
+                System.out.println("temp " + temp);
                 application.setApp_endDate(temp);
             }
         }
         if(req.get("create") != null){
+            System.out.println("create " + req.get("create"));
             String temp = req.get("create").toString();
             if(temp != null){
+                System.out.println(" temp " + temp);
                 application.setApp_permit_Create(temp);
             }
         }
         if(req.get("open") != null){
+            System.out.println("open " + req.get("open"));
             String temp = req.get("open").toString();
             if(temp != null){
-                application.setApp_permit_Create(temp);
+                System.out.println(" temp " + temp);
+                // application.setApp_permit_Create(temp);
+                application.setApp_permit_Open(temp);
             }
         }
         if(req.get("toDo") != null){
+            System.out.println("toDo " + req.get("toDo"));
             String temp = req.get("toDo").toString();
             if(temp != null){
-                application.setApp_permit_Create(temp);
+                System.out.println(" temp " + temp);
+                // application.setApp_permit_Create(temp);
+                application.setApp_permit_toDoList(temp);
             }
         }
         if(req.get("doing") != null){
+            System.out.println("doing " + req.get("doing"));
             String temp = req.get("doing").toString();
             if(temp != null){
-                application.setApp_permit_Create(temp);
+                System.out.println(" temp " + temp);
+                // application.setApp_permit_Create(temp);
+                application.setApp_permit_Doing(temp);
             }
         }
         if(req.get("done") != null){
+            System.out.println("done " + req.get("done"));
             String temp = req.get("done").toString();
             if(temp != null){
-                application.setApp_permit_Create(temp);
+                System.out.println(" temp " + temp);
+                // application.setApp_permit_Create(temp);
+                application.setApp_permit_Done(temp);
             }
         }
-        if(req.get("rnumber") != null){
-            int temp = (int) req.get("rnumber");
-            application.setApp_Rnumber(temp);
-        }
+        // if(req.get("rnumber") != null){
+        //     int temp = (int) req.get("rnumber");
+        //     application.setApp_Rnumber(temp);
+        // }
 
         //Update application 
         boolean isUpdated = applicationRepository.updateApplication(application);

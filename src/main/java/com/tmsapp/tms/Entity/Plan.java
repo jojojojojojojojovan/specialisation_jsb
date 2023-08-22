@@ -47,11 +47,11 @@ public class Plan {
     public Plan(@JsonProperty("plan_MVP_name") String plan_MVP_name, 
                 @JsonProperty("plan_startDate") Date plan_startDate, 
                 @JsonProperty("plan_endDate") Date plan_endDate,
-                @JsonProperty("Colour") String Colour) {
+                @JsonProperty("colour") String colour) {
         Plan_MVP_name = plan_MVP_name;
         Plan_startDate = plan_startDate;
         Plan_endDate = plan_endDate;
-        this.Colour = Colour;
+        Colour = colour;
     }
 
     @JsonCreator
@@ -81,5 +81,12 @@ public class Plan {
         Plan_endDate = plan_endDate;
     }
 
+    public String getColour() {
+        return Colour;
+    }
+
+    public void setColour(String colour) {
+        Colour = colour;
+    }
 
 }

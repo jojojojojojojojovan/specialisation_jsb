@@ -114,21 +114,11 @@ public class TaskRepository {
             session = hibernateUtil.getSessionFactory().openSession();
             transaction =session.beginTransaction();
             System.out.println(appAcronym);
-            String hql = "SELECT new Task(t.taskName, t.taskDescription, t.taskNotes, t.taskId, t.taskPlan, t.taskAppAcronym, t.taskState, t.taskCreator, t.taskOwner, t.taskCreateDate) FROM Task t INNER JOIN t.taskAppAcronym a WHERE a.App_Acronym = :appAcronym";
+            String hql = "SELECT new Task(t.taskName, t.taskDescription, t.taskNotes, t.taskId, t.taskPlan, t.taskAppAcronym, t.taskState, t.taskCreator, t.taskOwner, t.taskCreateDate)FROM Task t INNER JOIN t.taskAppAcronym a LEFT JOIN t.taskPlan WHERE a.App_Acronym = :appAcronym";
+            
             Query<Task> query = session.createQuery(hql, Task.class);
             query.setParameter("appAcronym", appAcronym);
             List<Task> tasks = query.getResultList();
-            for(Task task: tasks) {
-                System.out.println(task.getTaskPlan());
-            }
-
-            String hql2 = "FROM Task t INNER JOIN t.taskAppAcronym a WHERE a.App_Acronym = :appAcronym";
-            Query<Task> query2 = session.createQuery(hql, Task.class);
-            query2.setParameter("appAcronym", appAcronym);
-            List<Task> tasks2 = query2.getResultList();
-            for(Task task: tasks2) {
-                System.out.println(task.getTaskPlan().getPlan_MVP_name());
-            }
             tasksDTO = !tasks.isEmpty()? tasks.stream().map(task -> new TaskDTO(task)).collect(Collectors.toList()): null;
             transaction.commit();
         }catch(Exception e){

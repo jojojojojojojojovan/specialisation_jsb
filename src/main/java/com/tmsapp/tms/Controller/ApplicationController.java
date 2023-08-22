@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.ParseException;
+
 import com.tmsapp.tms.Service.ApplicationService;
 
 @RestController
@@ -20,7 +22,7 @@ public class ApplicationController {
     private ApplicationService applicationService;
 
     //INPUT: appAcronym
-    @PostMapping("/get-application")
+    @PostMapping("/getApplication")
     public ResponseEntity<Map<String, Object>> getApplication(@RequestBody Map<String, Object> req) {
         Map<String, Object> response = new HashMap<>();
         response.putAll(applicationService.getApplication(req));
@@ -39,7 +41,7 @@ public class ApplicationController {
 
     //INPUT: un, gn, appAcronym, end date, create(OPTIONAL), open(OPTIONAL), toDo(OPTIONAL), doing(OPTIONAL), done(OPTIONAL)
     @PostMapping("/updateApplication")
-    public ResponseEntity<Map<String, Object>> updateApplication(@RequestBody Map<String, Object> req) {
+    public ResponseEntity<Map<String, Object>> updateApplication(@RequestBody Map<String, Object> req) throws ParseException {
         Map<String, Object> response = new HashMap<>();
         response.putAll(applicationService.updateApplication(req));
 

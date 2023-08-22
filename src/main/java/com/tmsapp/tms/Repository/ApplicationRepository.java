@@ -8,6 +8,7 @@ import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.tmsapp.tms.Entity.Account;
 import com.tmsapp.tms.Entity.Application;
 import com.tmsapp.tms.Util.HibernateUtil;
 
@@ -47,10 +48,22 @@ public class ApplicationRepository {
     public Application getApplication(String appName){
         Transaction transaction = null;
         Application result = null;
+        System.out.println("appname " + appName);
         try{
             session = hibernateUtil.getSessionFactory().openSession();
             transaction =session.beginTransaction();
+
+            // String hql = "FROM Application WHERE App_Acronym=:acronym";
+
+            // Query<Application> query = session.createQuery(hql, Application.class);
+            // System.out.println(" query " + query);
+            // query.setParameter("acronym", appName);
+            // System.out.println(appName);
+            // appName = query.getSingleResult();
+
+
             result = session.get(Application.class, appName);
+            System.out.println("result " + result);
             
             transaction.commit();
         }catch(Exception e){
@@ -64,7 +77,7 @@ public class ApplicationRepository {
                 session.close();
             }
         }
-
+System.out.println("result after " + result);
         return result;
     }
 

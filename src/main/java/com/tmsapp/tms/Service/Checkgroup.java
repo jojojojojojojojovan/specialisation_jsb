@@ -19,13 +19,11 @@ public class Checkgroup {
         boolean result = false;
         Account account = accountRepository.getAccountByUsername(username);
         if(account != null){
-            List<Accgroup> userGroups = accountRepository.getGroupsByUsername(account.getUsername());
-            if(userGroups != null){
-                for (Accgroup accgroup : userGroups) {
+            List<Accgroup> userGroups = accountRepository.getGroupsByUsername(username);
+            for (Accgroup accgroup : userGroups) {
                 if(groupName.equals(accgroup.getGroupName())){
                     result = true;
                 }
-            }
             }
         }
 

@@ -43,7 +43,7 @@ public class Task {
     @Column
     private Date taskCreateDate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JsonIgnore
     @JoinColumn(name = "task_plan", referencedColumnName = "Plan_MVP_name")
     private Plan taskPlan;

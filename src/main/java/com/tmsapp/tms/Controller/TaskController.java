@@ -25,7 +25,6 @@ import com.tmsapp.tms.Service.Checkgroup;
 import com.tmsapp.tms.Service.TaskService;
 
 @RestController
-@RequestMapping("/")
 @CrossOrigin(origins = "*")
 public class TaskController {
 
@@ -35,27 +34,32 @@ public class TaskController {
     @Autowired
     Checkgroup checkgroup;
 
-    @PostMapping(path = "/create-task")
+    @PostMapping(path = "/createTask")
     public ResponseEntity<Map<String, Object>> createTask(@RequestBody TaskDTO task, @CookieValue("authToken") String jwtToken) {
 
         Map<String, Object> response = new HashMap<>();
-        response = taskService.createTask(task, jwtToken);
+        taskService.createTask(task, jwtToken);
         return ResponseEntity.status(HttpStatus.OK).body(response);
       
     }
 
     //get task by taskid
-    @GetMapping(path = "/all-task/{taskId}")
-    public ResponseEntity<TaskDTO> getTaskById(@PathVariable String taskId) {
-        TaskDTO task = taskService.getTaskById(taskId);
+    @PostMapping(path = "/getAllTask/taskId")
+    public ResponseEntity<Map<String, Object>> getTaskById(@RequestBody Map<String, Object> taskIdObj) {
+        Map<String, Object> response = new HashMap<>();
+        TaskDTO task = taskService.getTaskById((String) taskIdObj.get("taskId"));
         // return ResponseEntity.ok(true);
         System.out.println("task in controller" + task);
+        if(task != null) {
+            response.put("success", true);
+            response.put("task", task);
+        }
        
-        return ResponseEntity.ok(task);
+        return ResponseEntity.ok(response);
     }
 
     //get task by plan
-    @PostMapping(path = "/all-task/plan")
+    @PostMapping(path = "/getAllTask/plan")
     public ResponseEntity<List<TaskDTO>> getTaskByPlan(@RequestBody Map<String, Object> req) {
         String taskPlan = (String) req.get("planName");
         List<TaskDTO> tasksDTO = taskService.getTasksByPlan(taskPlan);
@@ -65,7 +69,7 @@ public class TaskController {
     }
 
     //get task by application
-    @PostMapping(path = "/all-task/app")
+    @PostMapping(path = "/getAllTask/app")
     public ResponseEntity<Map<String, Object>> getTaskByApplication(@RequestBody Map<String, Object> req,  @CookieValue("authToken") String jwtToken) {
         Map<String, Object> response = new HashMap<>();
         
@@ -78,7 +82,7 @@ public class TaskController {
     }
     
 
-    @GetMapping(path = "/all-task")
+    @GetMapping(path = "/getAllTask")
     public ResponseEntity<List<TaskDTO>> getAllTask() {
         List<TaskDTO> task = taskService.getAllTask();
         // return ResponseEntity.ok(true);
@@ -88,10 +92,18 @@ public class TaskController {
     }
 
     //INPUT: taskId, un, gn, userNotes(OPTIONAL), taskState, acronym, taskPlan(OPTIONAL)
-    @PostMapping(path = "/pm-update/task")
+    @PostMapping(path = "/PMEditTask")
     public ResponseEntity<Map<String, Object>> PMEditTask(@RequestBody Map<String, Object> req) {
         Map<String, Object> response = new HashMap<>();
         response.putAll(taskService.PMEditTask(req));
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    //INPUT: taskId, un, gn, userNotes(OPTIONAL), taskState, acronym, taskPlan(OPTIONAL)
+    @PostMapping(path = "/PLEditTask")
+    public ResponseEntity<Map<String, Object>> PLEditTask(@RequestBody Map<String, Object> req) {
+        Map<String, Object> response = new HashMap<>();
+        response.putAll(taskService.PLEditTask(req));
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -102,4 +114,21 @@ public class TaskController {
         result.put("success", userTest);
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
+
+    //INPUT: taskId, un, gn, userNotes(OPTIONAL), taskState, acronym
+    @PostMapping(path = "/tm-update/taskToDoToDoing")
+    public ResponseEntity<Map<String, Object>> TMEditTaskToDoToDoing(@RequestBody Map<String, Object> req) {
+        Map<String, Object> response = new HashMap<>();
+        response.putAll(taskService.TMEditTaskToDoToDoing(req));
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+    
+    @PostMapping(path = "/tm-update/taskDoingoToDone")
+    public ResponseEntity<Map<String, Object>> TMEditTaskDoingToDone(@RequestBody Map<String, Object> req) {
+        Map<String, Object> response = new HashMap<>();
+        response.putAll(taskService.TMEditTaskDoingToDone(req));
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    
 }

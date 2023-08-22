@@ -8,12 +8,15 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.tmsapp.tms.Entity.Accgroup;
 import com.tmsapp.tms.Entity.Account;
-import com.tmsapp.tms.Entity.JwtInvalidation;
 import com.tmsapp.tms.Repository.AccountRepository;
-import com.tmsapp.tms.Repository.JwtRepository;
+import com.tmsapp.tms.Service.AccountService;
+
+import java.util.Map;
+import java.util.HashMap;
 
 @SpringBootApplication
 public class TmsApplication {
@@ -23,15 +26,30 @@ public class TmsApplication {
 		SpringApplication.run(TmsApplication.class, args);
 	}
 
-	// @Autowired
-	// private AccountRepository accountRepository;
+	@Autowired
+	private AccountRepository accountRepository;
 
-	// @EventListener(ApplicationReadyEvent.class)
-	// public void createInitialAccount() {
-	// 	List<Accgroup> gList = new ArrayList<Accgroup>();
-	// 	gList.add(new Accgroup("testing2"));
-	// 	Account a1 = new Account("user2", "p@ssw0rd2", 1, "email2@tms.com", gList);
-	// 	accountRepository.createAccount(a1);
-	// }
+	@Autowired
+	private AccountService accountService;
+
+	@EventListener(ApplicationReadyEvent.class)
+	public void createInitialAccount() {
+		Account adminUser = accountRepository.getAccountByUsername("admin");
+		if(adminUser != null) {
+			return;
+		}
+		Map<String, Object> account = new HashMap<>();
+		Map<String, Object> groups = new HashMap<>();
+		groups.put("groupName", "admin");
+		account.put("username", "admin");
+		account.put("password", "p@ssword1");
+		account.put("status", 1);
+		List<Object> groupsList = new ArrayList<Object>();
+		groupsList.add(groups);
+		account.put("groups", groupsList);
+		Map<String, Object> input = new HashMap<>();
+		input.put("account", account);
+		accountService.createAccount(input);
+	}
 
 }
