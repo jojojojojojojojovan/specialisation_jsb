@@ -123,7 +123,7 @@ public class TaskController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
     
-    @PostMapping(path = "/tm-update/taskDoingoToDone")
+    @PostMapping(path = "/tm-update/taskDoingToDone")
     public ResponseEntity<Map<String, Object>> TMEditTaskDoingToDone(@RequestBody Map<String, Object> req) {
         Map<String, Object> response = new HashMap<>();
         response.putAll(taskService.TMEditTaskDoingToDone(req));
