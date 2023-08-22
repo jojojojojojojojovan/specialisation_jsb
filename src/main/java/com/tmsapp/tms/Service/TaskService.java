@@ -113,7 +113,14 @@ public class TaskService {
         // Application application = applicationRepository.getApplication(task.getTaskAppAcronym());
         String appAcronym =application.getApp_Acronym();
 
-        Plan plan = planRepository.getPlansByPlanName(task.getTaskPlan());
+        Plan plan = new Plan();
+
+        try {
+            plan = planRepository.getPlansByPlanName(task.getTaskPlan());
+        }
+        catch(Exception e) {
+            plan = null;
+        }
 
         //Input validation
         if(task.getTaskName() == null || task.getTaskAppAcronym() == null || task.getTaskCreator() == null || task.getTaskOwner() == null){
@@ -122,20 +129,20 @@ public class TaskService {
 
         // System generate task note
         Date tempNow = new Date();
-        String systemNotes = "system|open|" + tempNow.toInstant().toString() + "|Task created||";
+        String systemNotes = "||system|open|" + tempNow.toInstant().toString() + "|Task created";
         taskNotes = systemNotes;
         System.out.println(task.getTaskNotes());
-        if (task.getTaskNotes() != null) {
+        if (task.getTaskNotes() != null && !task.getTaskNotes().equals("")) {
             String notesRegex = "\\|";
             if (!task.getTaskNotes().matches(notesRegex)) {
                 System.out.println("user notes present");
-                String userNotes = task.getTaskCreator() + "|open|" + tempNow.toInstant().toString() + "|" + task.getTaskNotes() + "||";
+                String userNotes = "||" +  task.getTaskCreator() + "|open|" + tempNow.toInstant().toString() + "|" + task.getTaskNotes();
                 // System.out.println(userNotes);
                 taskNotes += userNotes;
                 // System.out.println(taskNotes);
             }
         }
-
+        System.out.println(taskNotes);
         task.setTaskNotes(taskNotes);
 
         //system generate taskId from application Rnumber
@@ -145,6 +152,12 @@ public class TaskService {
         //update appRNumber;
         application.setApp_Rnumber(appRNumber + 1);
         applicationRepository.updateApplication(application);
+
+        //create date
+        task.setTaskCreateDate(tempNow);
+        if(task.getTaskState() == null) {
+            task.setTaskState("open");
+        } 
 
         try {
             System.out.println("applicsation in service: " + application);
@@ -368,12 +381,12 @@ public class TaskService {
             return response;
         }
         if(task.getTaskState().toLowerCase() != req.get("taskState").toString().toLowerCase()){
-            systemNotes = "system|" + req.get("un").toString().toLowerCase() + "|" + tempDateNow.toInstant().toString() + "| Updated task state||";
+            systemNotes = "||system|" + req.get("un").toString().toLowerCase() + "|" + tempDateNow.toInstant().toString() + "| Updated task state";
             task.setTaskState(req.get("taskState").toString());
         }
         if(req.get("userNotes") != null){
-            systemNotes = "system|" + req.get("un").toString().toLowerCase() + "|" + tempDateNow.toInstant().toString() + "| Updated task user notes||";
-            userNotes = req.get("un").toString() + "|" + task.getTaskState() + "|" + tempDateNow.toInstant().toString() + "|" + req.get("userNotes") + "||";
+            systemNotes = "||system|" + req.get("un").toString().toLowerCase() + "|" + tempDateNow.toInstant().toString() + "| Updated task user notes";
+            userNotes = "||" + req.get("un").toString() + "|" + task.getTaskState() + "|" + tempDateNow.toInstant().toString() + "|" + req.get("userNotes");
         }
         if(systemNotes != null){
             task.setTaskNotes(task.getTaskNotes().concat(systemNotes));

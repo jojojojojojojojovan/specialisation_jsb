@@ -38,7 +38,14 @@ public class TaskController {
     public ResponseEntity<Map<String, Object>> createTask(@RequestBody TaskDTO task, @CookieValue("authToken") String jwtToken) {
 
         Map<String, Object> response = new HashMap<>();
-        taskService.createTask(task, jwtToken);
+        try {
+            taskService.createTask(task, jwtToken);
+            response.put("success", true);
+        }
+        catch(Exception e) {
+            response.put("success", false);
+        }
+        
         return ResponseEntity.status(HttpStatus.OK).body(response);
       
     }
