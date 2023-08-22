@@ -69,7 +69,7 @@ public class TaskController {
     }
 
     //get task by application
-    @PostMapping(path = "/getAllTask/app")
+    @PostMapping(path = "/all-task/app")
     public ResponseEntity<Map<String, Object>> getTaskByApplication(@RequestBody Map<String, Object> req,  @CookieValue("authToken") String jwtToken) {
         Map<String, Object> response = new HashMap<>();
         
@@ -91,7 +91,7 @@ public class TaskController {
         return ResponseEntity.ok(task);
     }
 
-    //INPUT: taskId, un, gn, userNotes(OPTIONAL), taskState, acronym, taskPlan(OPTIONAL)
+    //INPUT: taskId, un, gn, userNotes(OPTIONAL), taskState, taskPlan(OPTIONAL)
     @PostMapping(path = "/PMEditTask")
     public ResponseEntity<Map<String, Object>> PMEditTask(@RequestBody Map<String, Object> req) {
         Map<String, Object> response = new HashMap<>();
