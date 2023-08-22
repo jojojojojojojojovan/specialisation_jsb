@@ -69,7 +69,7 @@ public class TaskController {
     }
 
     //get task by application
-    @PostMapping(path = "/getAllTask/app")
+    @PostMapping(path = "/all-task/app")
     public ResponseEntity<Map<String, Object>> getTaskByApplication(@RequestBody Map<String, Object> req,  @CookieValue("authToken") String jwtToken) {
         Map<String, Object> response = new HashMap<>();
         
