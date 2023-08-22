@@ -29,6 +29,10 @@ public class CustomAuthenticationManager implements AuthenticationManager{
             throw new BadCredentialsException("Wrong pass");
         }
 
+        if(account.getStatus() == 0 ){
+            throw new BadCredentialsException("disabled");
+        }
+
         return new UsernamePasswordAuthenticationToken(authentication.getName(), account.getPassword());
     }
     

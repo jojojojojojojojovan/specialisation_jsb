@@ -1,5 +1,7 @@
 package com.tmsapp.tms.Service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -44,6 +46,9 @@ public class ApplicationService {
             return result;
         }
 
+        System.out.println(req.get("startDate"));
+        System.out.println(req.get("endDate"));
+
         //Validate permit groups
         String open = null;
         String toDo = null;
@@ -81,8 +86,24 @@ public class ApplicationService {
             }
         }
 
+        //Start and end date
+        SimpleDateFormat dateTemplate = new SimpleDateFormat("yyyy-MM-dd");
+        Date startDate = null;
+        Date endDate = null;
+        try {
+            startDate = dateTemplate.parse(req.get("startDate").toString());
+            endDate = dateTemplate.parse(req.get("endDate").toString());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        if(startDate == null || endDate == null){
+            result.put("success", false);
+            return result;
+        }
+
         //Construct application
-        Application application = new Application(req.get("appAcronym").toString(), req.get("description").toString(), (int) req.get("rnumber"), (Date) req.get("startDate"), (Date) req.get("endDate"), create, open, toDo, doing, done);
+        Application application = new Application(req.get("appAcronym").toString(), req.get("description").toString(), (int) req.get("rnumber"), startDate, endDate, create, open, toDo, doing, done);
         Boolean isCreated = applicationRepository.createApplication(application) || false;
         if(isCreated){
             result.put("success", true);

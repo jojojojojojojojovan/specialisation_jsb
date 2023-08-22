@@ -31,10 +31,10 @@ public class AuthenticationService {
 
     public Map<String, Object> authenticateUser(Map<String, Object> req, String jwtToken) {
         Map<String, Object> result = new HashMap<>();
-        
+
         if(jwtToken == null) {
             result.put("success", false);
-            result.put("message", "invalid token");
+            result.put("message", "invalid token 31244");
             return result;
         }
         try {
@@ -50,7 +50,7 @@ public class AuthenticationService {
 
                 if(user == null) {
                     result.put("success", false);
-                    result.put("message", "invalid token");
+                    result.put("message", "invalid token 3333");
                 }
                 List<Accgroup> userGroups  = accountRepository.getGroupsByUsername(username);
 
@@ -71,7 +71,8 @@ public class AuthenticationService {
         } catch (Exception e) {
             // log exception e
             result.put("success", false);
-            result.put("message", "invalid token");
+            result.put("message", "invalid token ex");
+            e.printStackTrace();
             return result;
         }
         return result;

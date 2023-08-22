@@ -118,42 +118,31 @@ public class AccountRepository {
         return account;
     }
 
-    public List<Accgroup> getGroupsByUsername(String username){
-        Transaction transaction = null;
-        List<Accgroup> groups = null;
-        Account account = null;
-        try{
-            session = hibernateUtil.getSessionFactory().openSession();
-            transaction =session.beginTransaction();
+    public List<Accgroup> getGroupsByUsername(String username) {
+        List<Accgroup> groups = new ArrayList<>();
+        
+        try (Session session = hibernateUtil.getSessionFactory().openSession()) {
+            Transaction transaction = session.beginTransaction();
+            
             String hql = "SELECT ag FROM Accgroup ag JOIN ag.accounts acc WHERE acc.username = :un";
             Query<Accgroup> query = session.createQuery(hql, Accgroup.class);
             query.setParameter("un", username);
             
             groups = query.getResultList();
-            // if(account != null){
-            //     // Hibernate.initialize(account.getAccgroups());
-            //     groups = account.getAccgroups();
-            // }
+            System.out.println(username);
+            
             transaction.commit();
-        }
-        catch(NoResultException e){
-            account = null;
+        } catch (NoResultException e) {
+            // Handle NoResultException
+            e.printStackTrace();
+        } catch (Exception e) {
+            // Handle other exceptions
             e.printStackTrace();
         }
-        catch(Exception e){
-            if(transaction != null){
-                transaction.rollback();
-
-            }
-            e.printStackTrace();
-        }finally{
-            if(session != null){
-                session.close();
-            }
-        }
-
+        
         return groups;
     }
+    
 
     public List<AccountDTO> getAllAccounts(){
         Transaction transaction = null;

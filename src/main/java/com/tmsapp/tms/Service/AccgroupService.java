@@ -11,7 +11,9 @@ import org.springframework.stereotype.Service;
 
 import com.tmsapp.tms.Entity.Accgroup;
 import com.tmsapp.tms.Entity.AccgroupDTO;
+import com.tmsapp.tms.Entity.Account;
 import com.tmsapp.tms.Repository.AccgroupRepository;
+import com.tmsapp.tms.Repository.AccountRepository;
 
 @Service
 public class AccgroupService {
@@ -23,6 +25,9 @@ public class AccgroupService {
     Checkgroup checkgroup;
 
     @Autowired
+    AccountRepository accountRepository;
+
+    @Autowired
     public AccgroupService(AccgroupRepository accGroupRepository) {
         this.accGroupRepository = accGroupRepository;
     }
@@ -30,8 +35,9 @@ public class AccgroupService {
     public Map<String, Object> createAccgroup(Map<String, Object> req) {
         Map<String, Object> result = new HashMap<>();
         Boolean user = checkgroup.checkgroup(req.get("un").toString(), req.get("gn").toString());
+        Account account = accountRepository.getAccountByUsername(req.get("un").toString());
         try {
-            if (user) {
+            if (user == true && account.getStatus() == 1) {
                 Accgroup accgroup = null;
                 if(req.get("groupName") != null  && !req.get("groupName").toString().isEmpty()){
                     accgroup = new Accgroup(req.get("groupName").toString());
@@ -41,9 +47,15 @@ public class AccgroupService {
                         return result;
                     }
                 }
+            }else{
+                result.put("success", false);
+                result.put("message", "status inactive");
+                return result;
             }
         } catch (Exception error) {
-            System.out.println(error);
+            result.put("success", false);
+            result.put("message", "status inactive");
+            return result;
         }
         result.put("success", false);
         return result;

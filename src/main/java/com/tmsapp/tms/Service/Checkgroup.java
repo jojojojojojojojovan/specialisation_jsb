@@ -20,10 +20,12 @@ public class Checkgroup {
         Account account = accountRepository.getAccountByUsername(username);
         if(account != null){
             List<Accgroup> userGroups = accountRepository.getGroupsByUsername(account.getUsername());
-            for (Accgroup accgroup : userGroups) {
+            if(userGroups != null){
+                for (Accgroup accgroup : userGroups) {
                 if(groupName.equals(accgroup.getGroupName())){
                     result = true;
                 }
+            }
             }
         }
 
