@@ -430,7 +430,6 @@ public class TaskService {
         TaskDTO task = taskRepository.getTaskById(id);
 
 
-        Plan newPlan = null;
         if(task == null){
             response.put("success", false);
             response.put("message", "Invalid task id");
@@ -481,11 +480,15 @@ public class TaskService {
 
         //Update task creator
         task.setTaskOwner(req.get("un").toString());
-        if(req.get("taskPlan") !=null){
-            newPlan = planRepository.getPlansByPlanName(req.get("taskPlan").toString());
-        }
+        
+        // if(req.get("taskPlan") !=null){
+        //     newPlan = planRepository.getPlansByPlanName(req.get("taskPlan").toString());
+        // }
+        Plan newPlan = planRepository.getPlansByPlanName(task.getTaskPlan());
+
         //update task
         Task updateTask = new Task(task, application, newPlan);
+
         boolean isUpdated = taskRepository.updateTask(updateTask);
 
         if(req.get("taskState").equals("Done") && isUpdated){
