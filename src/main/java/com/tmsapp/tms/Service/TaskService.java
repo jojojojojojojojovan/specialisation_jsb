@@ -402,7 +402,7 @@ public class TaskService {
     public Map<String, Object> TMEditTask (Map<String, Object> req){
         Map<String, Object> response = new HashMap<>();
         //Check for required fields 
-        if(req.get("taskId") == null || req.get("un") == null || req.get("gn") == null || req.get("taskState") == null || req.get("taskOwner") == null || req.get("acronym")==null){
+        if(req.get("taskId") == null || req.get("un") == null || req.get("gn") == null || req.get("taskState") == null || req.get("taskOwner") == null){ //|| req.get("acronym")==null){
             response.put("success", false);
             response.put("message", "mandatory fields missing");
             return response;
@@ -417,14 +417,39 @@ public class TaskService {
         }
 
         //Get application and Task
-        Application application = applicationRepository.getApplication(req.get("acronym").toString());
-        TaskDTO task = taskRepository.getTaskById(req.get("taskId").toString());
+        // Application application = applicationRepository.getApplication(req.get("acronym").toString());
+        // TaskDTO task = taskRepository.getTaskById(req.get("taskId").toString());
+        // Application application = applicationRepository.getApplication(task.getTaskAppAcronym());
+
+        String id = req.get("taskId").toString();
+        String un = req.get("un").toString().toLowerCase();
+        String gn = req.get("gn").toString().toLowerCase();
+
+        Application application;
+        // Plan newPlan;
+        TaskDTO task = taskRepository.getTaskById(id);
+
+
         Plan newPlan = null;
-        if(application == null || task == null){
+        if(task == null){
             response.put("success", false);
-            response.put("message", "No available task/application");
+            response.put("message", "Invalid task id");
             return response;
+        } else{
+            //task state not in open
+            if(!task.getTaskState().toLowerCase().equals("to do") && !task.getTaskState().toLowerCase().equals("doing")){
+                System.out.println("task.getTaskState() " + task.getTaskState());
+                response.put("success", false);
+                response.put("message", "Current task is not in " + task.getTaskState() +" state");
+                return response;
+            }
+            application = applicationRepository.getApplication(task.getTaskAppAcronym());
         }
+        // if(application == null || task == null){
+        //     response.put("success", false);
+        //     response.put("message", "No available task/application");
+        //     return response;
+        // }
 
         //Get current date
         Date tempDateNow = new Date();
@@ -438,13 +463,13 @@ public class TaskService {
         System.out.println("req.get(\"taskState\") "  + req.get("taskState"));
 
         if(task.getTaskState().toLowerCase() != req.get("taskState").toString().toLowerCase()){
-            systemNotes = "system|" + req.get("un").toString().toLowerCase() + "|" + tempDateNow.toInstant().toString() + "| Updated task state||";
+            systemNotes = "||system|" + req.get("un").toString().toLowerCase() + "|" + tempDateNow.toInstant().toString() + "| Updated task state";
             task.setTaskState(req.get("taskState").toString());
         }
 
         if(req.get("userNotes") != null){
-            systemNotes = "system|" + req.get("un").toString().toLowerCase() + "|" + tempDateNow.toInstant().toString() + "| Updated task user notes||";
-            userNotes = req.get("un").toString() + "|" + task.getTaskState() + "|" + tempDateNow.toInstant().toString()+ "|" + req.get("userNotes") + "||";
+            systemNotes = "||system|" + req.get("un").toString().toLowerCase() + "|" + tempDateNow.toInstant().toString() + "| Updated task user notes||";
+            userNotes = req.get("un").toString() + "|" + task.getTaskState() + "|" + tempDateNow.toInstant().toString()+ "|" + req.get("userNotes");
         }
 
         if(systemNotes != null){
@@ -456,7 +481,9 @@ public class TaskService {
 
         //Update task creator
         task.setTaskOwner(req.get("un").toString());
-
+        if(req.get("taskPlan") !=null){
+            newPlan = planRepository.getPlansByPlanName(req.get("taskPlan").toString());
+        }
         //update task
         Task updateTask = new Task(task, application, newPlan);
         boolean isUpdated = taskRepository.updateTask(updateTask);
