@@ -91,7 +91,7 @@ public class TaskController {
         return ResponseEntity.ok(task);
     }
 
-    //INPUT: taskId, un, gn, userNotes(OPTIONAL), taskState, acronym, taskPlan(OPTIONAL)
+    //INPUT: taskId, un, gn, userNotes(OPTIONAL), taskState, taskPlan(OPTIONAL)
     @PostMapping(path = "/PMEditTask")
     public ResponseEntity<Map<String, Object>> PMEditTask(@RequestBody Map<String, Object> req) {
         Map<String, Object> response = new HashMap<>();
