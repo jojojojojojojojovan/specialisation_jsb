@@ -8,7 +8,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 
 import org.hibernate.Hibernate;
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -163,12 +163,12 @@ public class AccountRepository {
             session = hibernateUtil.getSessionFactory().openSession();
             transaction =session.beginTransaction();
             String hql = "FROM com.tmsapp.tms.Entity.Account";
-            Query<Account> query = session.createQuery(hql, Account.class);
-            accounts = query.list();
+            TypedQuery<Account> query = session.createQuery(hql, Account.class);
+            accounts = query.getResultList();
 
             for (Account acc : accounts) {
                 String hql2 = "SELECT ag FROM Accgroup ag JOIN ag.accounts acc WHERE acc.username = :un";
-                Query<Accgroup> query2 = session.createQuery(hql2, Accgroup.class);
+                TypedQuery<Accgroup> query2 = session.createQuery(hql2, Accgroup.class);
                 query2.setParameter("un", acc.getUsername());
                 List<Accgroup> tempaccgroup = query2.getResultList();
                 System.out.println(tempaccgroup);

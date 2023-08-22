@@ -402,7 +402,7 @@ public class TaskService {
     }
 
 
-        public Map<String, Object> TMEditTaskToDoToDoing (Map<String, Object> req){
+    public Map<String, Object> TMEditTaskToDoToDoing (Map<String, Object> req){
         Map<String, Object> response = new HashMap<>();
         //Check for required fields 
         if(req.get("taskId") == null || req.get("un") == null || req.get("gn") == null || req.get("taskState") == null || req.get("taskOwner") == null || req.get("acronym") == null){
@@ -423,6 +423,7 @@ public class TaskService {
         Application application = applicationRepository.getApplication(req.get("acronym").toString());
         TaskDTO task = taskRepository.getTaskById(req.get("taskId").toString());
         Plan newPlan = null;
+        
         if(application == null || task == null){
             response.put("success", false);
             response.put("message", "No available task/application");
@@ -458,11 +459,16 @@ public class TaskService {
             task.setTaskNotes(task.getTaskNotes().concat(userNotes));
         }
 
+        if(req.get("taskPlan") !=null){
+            newPlan = planRepository.getPlansByPlanName(req.get("taskPlan").toString());
+        }
+
         //Update task creator
         task.setTaskOwner(req.get("un").toString());
 
         //update task
         Task updateTask = new Task(task, application, newPlan);
+
         boolean isUpdated = taskRepository.updateTask(updateTask);
         
         //Return
@@ -529,6 +535,10 @@ public class TaskService {
         }
         if(userNotes != null){
             task.setTaskNotes(task.getTaskNotes().concat(userNotes));
+        }
+        
+        if(req.get("taskPlan") !=null){
+            newPlan = planRepository.getPlansByPlanName(req.get("taskPlan").toString());
         }
 
         //Update task creator
