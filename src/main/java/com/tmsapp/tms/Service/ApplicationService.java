@@ -85,8 +85,8 @@ public class ApplicationService {
                 open = tempgroup.getGroupName();
             }
         }
-        if(req.get("todo") != null){
-            Accgroup tempgroup = accgroupRepository.getGroupByGroupName(req.get("todo").toString());
+        if(req.get("toDo") != null){
+            Accgroup tempgroup = accgroupRepository.getGroupByGroupName(req.get("toDo").toString());
             if(tempgroup != null){
                 toDo = tempgroup.getGroupName();
             }
@@ -120,10 +120,14 @@ public class ApplicationService {
 
 
         //Construct application
-        Application application = new Application(req.get("acronym").toString(), req.get("description").toString(), (int) req.get("rnumber"), checkStartDate, checkEndDate, create, open, toDo, doing, done);
-        Boolean isCreated = applicationRepository.createApplication(application) || false;
-        if(isCreated){
+        Application application = new Application(req.get("acronym").toString(), req.get("description").toString(), Integer.valueOf(req.get("rnumber").toString()), checkStartDate, checkEndDate, create, open, toDo, doing, done);
+        Map<String, Object> isCreated = applicationRepository.createApplication(application);
+        if((Boolean) isCreated.get("success")){
             result.put("success", true);
+        }
+        else if(isCreated.get("message").toString().equals("application exists")) {
+            result.put("message", "application exists");
+            result.put("success", false);
         }
         else{
             result.put("message", "not created for some reason");

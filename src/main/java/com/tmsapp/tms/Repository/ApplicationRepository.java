@@ -1,6 +1,8 @@
 package com.tmsapp.tms.Repository;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -20,29 +22,30 @@ public class ApplicationRepository {
 
     static Session session;
 
-    public boolean createApplication(Application application){
+    public Map<String, Object> createApplication(Application application){
+        Map<String, Object> response = new HashMap<>();
         Transaction transaction = null;
-        Boolean result = false;
         try{
             session = hibernateUtil.getSessionFactory().openSession();
             transaction =session.beginTransaction();
             session.save(application);
             
-            result = true;
             transaction.commit();
         }catch(Exception e){
             if(transaction != null){
                 transaction.rollback();
-
+                
             }
-            e.printStackTrace();
+            response.put("success", false);
+            response.put("message", "application exists");
+            return response;
         }finally{
             if(session != null){
                 session.close();
             }
         }
-
-        return result;
+        response.put("success", true);
+        return response;
     }
 
     public Application getApplication(String appName){
