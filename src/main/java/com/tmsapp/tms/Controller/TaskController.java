@@ -44,7 +44,7 @@ public class TaskController {
     }
 
     //get task by taskid
-    @PostMapping(path = "/getAllTask/taskId")
+    @PostMapping(path = "/all-task/taskId")
     public ResponseEntity<Map<String, Object>> getTaskById(@RequestBody Map<String, Object> taskIdObj) {
         Map<String, Object> response = new HashMap<>();
         TaskDTO task = taskService.getTaskById((String) taskIdObj.get("taskId"));
@@ -69,7 +69,7 @@ public class TaskController {
     }
 
     //get task by application
-    @PostMapping(path = "/getAllTask/app")
+    @PostMapping(path = "/all-task/app")
     public ResponseEntity<Map<String, Object>> getTaskByApplication(@RequestBody Map<String, Object> req,  @CookieValue("authToken") String jwtToken) {
         Map<String, Object> response = new HashMap<>();
         
@@ -123,7 +123,7 @@ public class TaskController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
     
-    @PostMapping(path = "/tm-update/taskDoingoToDone")
+    @PostMapping(path = "/tm-update/taskDoingToDone")
     public ResponseEntity<Map<String, Object>> TMEditTaskDoingToDone(@RequestBody Map<String, Object> req) {
         Map<String, Object> response = new HashMap<>();
         response.putAll(taskService.TMEditTaskDoingToDone(req));
