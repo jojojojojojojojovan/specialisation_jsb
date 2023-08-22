@@ -47,8 +47,8 @@ public class TaskService {
     @Autowired
     private ObjectMapper objectMapper;
 
-    // @Autowired
-    // EmailService emailService;
+    @Autowired
+    EmailService emailService;
 
     public Map<String, Object> createTask(TaskDTO task, String jwtToken) {
 
@@ -399,11 +399,10 @@ public class TaskService {
         return response;
     }
 
-
-        public Map<String, Object> TMEditTaskToDoToDoing (Map<String, Object> req){
+    public Map<String, Object> TMEditTask (Map<String, Object> req){
         Map<String, Object> response = new HashMap<>();
         //Check for required fields 
-        if(req.get("taskId") == null || req.get("un") == null || req.get("gn") == null || req.get("taskState") == null || req.get("taskOwner") == null || req.get("acronym") == null){
+        if(req.get("taskId") == null || req.get("un") == null || req.get("gn") == null || req.get("taskState") == null || req.get("taskOwner") == null || req.get("acronym")==null){
             response.put("success", false);
             response.put("message", "mandatory fields missing");
             return response;
@@ -435,20 +434,19 @@ public class TaskService {
         String userNotes = null;
         //task state 
         //Check current task state as open
-        System.out.println(task.getTaskState());
-        if(!task.getTaskState().toLowerCase().equals("to do")){
-            response.put("success", false);
-            response.put("message", "Current task is not in to do state");
-            return response;
-        }
+        System.out.println("task.getTaskState()" +task.getTaskState());
+        System.out.println("req.get(\"taskState\") "  + req.get("taskState"));
+
         if(task.getTaskState().toLowerCase() != req.get("taskState").toString().toLowerCase()){
             systemNotes = "system|" + req.get("un").toString().toLowerCase() + "|" + tempDateNow.toInstant().toString() + "| Updated task state||";
             task.setTaskState(req.get("taskState").toString());
         }
+
         if(req.get("userNotes") != null){
             systemNotes = "system|" + req.get("un").toString().toLowerCase() + "|" + tempDateNow.toInstant().toString() + "| Updated task user notes||";
             userNotes = req.get("un").toString() + "|" + task.getTaskState() + "|" + tempDateNow.toInstant().toString()+ "|" + req.get("userNotes") + "||";
         }
+
         if(systemNotes != null){
             task.setTaskNotes(task.getTaskNotes().concat(systemNotes));
         }
@@ -462,6 +460,11 @@ public class TaskService {
         //update task
         Task updateTask = new Task(task, application, newPlan);
         boolean isUpdated = taskRepository.updateTask(updateTask);
+
+        if(req.get("taskState").equals("Done") && isUpdated){
+            emailService.sendEmail("tmspl0606@gmail.com", "Promote task " + req.get("taskId").toString() +" to done", "Promote task " + req.get("taskId").toString() +" to done");
+
+        }
         
         //Return
         if(isUpdated){
@@ -472,80 +475,160 @@ public class TaskService {
         response.put("success", false);
         return response;
     }
+
+
+    // public Map<String, Object> TMEditTaskToDoToDoing (Map<String, Object> req){
+    //     Map<String, Object> response = new HashMap<>();
+    //     //Check for required fields 
+    //     if(req.get("taskId") == null || req.get("un") == null || req.get("gn") == null || req.get("taskState") == null || req.get("taskOwner") == null || req.get("acronym") == null){
+    //         response.put("success", false);
+    //         response.put("message", "mandatory fields missing");
+    //         return response;
+    //     }
+
+    //     //check if user is pm 
+    //     boolean isTM = checkGroup.checkgroup(req.get("un").toString(), req.get("gn").toString());
+    //     if(!isTM){
+    //         response.put("success", false);
+    //         response.put("message", "unauthorized (NOT TM)");
+    //         return response;  
+    //     }
+
+    //     //Get application and Task
+    //     Application application = applicationRepository.getApplication(req.get("acronym").toString());
+    //     TaskDTO task = taskRepository.getTaskById(req.get("taskId").toString());
+    //     Plan newPlan = null;
+        
+    //     if(application == null || task == null){
+    //         response.put("success", false);
+    //         response.put("message", "No available task/application");
+    //         return response;
+    //     }
+
+    //     //Get current date
+    //     Date tempDateNow = new Date();
+
+    //     //System/User's notes
+    //     String systemNotes = null;
+    //     String userNotes = null;
+    //     //task state 
+    //     //Check current task state as open
+    //     System.out.println(task.getTaskState());
+    //     if(!task.getTaskState().toLowerCase().equals("to do")){
+    //         response.put("success", false);
+    //         response.put("message", "Current task is not in to do state");
+    //         return response;
+    //     }
+    //     if(task.getTaskState().toLowerCase() != req.get("taskState").toString().toLowerCase()){
+    //         systemNotes = "system|" + req.get("un").toString().toLowerCase() + "|" + tempDateNow.toInstant().toString() + "| Updated task state||";
+    //         task.setTaskState(req.get("taskState").toString());
+    //     }
+    //     if(req.get("userNotes") != null){
+    //         systemNotes = "system|" + req.get("un").toString().toLowerCase() + "|" + tempDateNow.toInstant().toString() + "| Updated task user notes||";
+    //         userNotes = req.get("un").toString() + "|" + task.getTaskState() + "|" + tempDateNow.toInstant().toString()+ "|" + req.get("userNotes") + "||";
+    //     }
+    //     if(systemNotes != null){
+    //         task.setTaskNotes(task.getTaskNotes().concat(systemNotes));
+    //     }
+    //     if(userNotes != null){
+    //         task.setTaskNotes(task.getTaskNotes().concat(userNotes));
+    //     }
+
+    //     if(req.get("taskPlan") !=null){
+    //         newPlan = planRepository.getPlansByPlanName(req.get("taskPlan").toString());
+    //     }
+
+    //     //Update task creator
+    //     task.setTaskOwner(req.get("un").toString());
+
+    //     //update task
+    //     Task updateTask = new Task(task, application, newPlan);
+
+    //     boolean isUpdated = taskRepository.updateTask(updateTask);
+        
+    //     //Return
+    //     if(isUpdated){
+    //         response.put("success", true);
+    //         return response;
+    //     }
+
+    //     response.put("success", false);
+    //     return response;
+    // }
     
-    public Map<String, Object> TMEditTaskDoingToDone (Map<String, Object> req){
-        Map<String, Object> response = new HashMap<>();
-        //Check for required fields 
-        if(req.get("taskId") == null || req.get("un") == null || req.get("gn") == null || req.get("taskState") == null || req.get("taskOwner") == null || req.get("acronym") == null){
-            response.put("success", false);
-            response.put("message", "mandatory fields missing");
-            return response;
-        }
+    // public Map<String, Object> TMEditTaskDoingToDone (Map<String, Object> req){
+    //     Map<String, Object> response = new HashMap<>();
+    //     //Check for required fields 
+    //     if(req.get("taskId") == null || req.get("un") == null || req.get("gn") == null || req.get("taskState") == null || req.get("taskOwner") == null || req.get("acronym") == null){
+    //         response.put("success", false);
+    //         response.put("message", "mandatory fields missing");
+    //         return response;
+    //     }
 
-        //check if user is pm 
-        boolean isTM = checkGroup.checkgroup(req.get("un").toString(), req.get("gn").toString());
-        if(!isTM){
-            response.put("success", false);
-            response.put("message", "unauthorized (NOT TM)");
-            return response;  
-        }
+    //     //check if user is pm 
+    //     boolean isTM = checkGroup.checkgroup(req.get("un").toString(), req.get("gn").toString());
+    //     if(!isTM){
+    //         response.put("success", false);
+    //         response.put("message", "unauthorized (NOT TM)");
+    //         return response;  
+    //     }
 
-        //Get application and Task
-        Application application = applicationRepository.getApplication(req.get("acronym").toString());
-        TaskDTO task = taskRepository.getTaskById(req.get("taskId").toString());
-        Plan newPlan = null;
-        if(application == null || task == null){
-            response.put("success", false);
-            response.put("message", "No available task/application");
-            return response;
-        }
+    //     //Get application and Task
+    //     Application application = applicationRepository.getApplication(req.get("acronym").toString());
+    //     TaskDTO task = taskRepository.getTaskById(req.get("taskId").toString());
+    //     Plan newPlan = null;
+    //     if(application == null || task == null){
+    //         response.put("success", false);
+    //         response.put("message", "No available task/application");
+    //         return response;
+    //     }
 
-        //Get current date
-        Date tempDateNow = new Date();
+    //     //Get current date
+    //     Date tempDateNow = new Date();
 
         //System/User's notes
-        String systemNotes = null;
-        String userNotes = null;
-        //task state 
-        //Check current task state as open
-        System.out.println(task.getTaskState());
-        if(!task.getTaskState().toLowerCase().equals("doing")){
-            response.put("success", false);
-            response.put("message", "Current task is not in Doing state");
-            return response;
-        }
-        if(task.getTaskState().toLowerCase() != req.get("taskState").toString().toLowerCase()){
-            systemNotes = "system|" + req.get("un").toString().toLowerCase() + "|" + tempDateNow.toInstant().toString() + "| Updated task state||";
-            task.setTaskState(req.get("taskState").toString());
-        }
-        if(req.get("userNotes") != null){
-            systemNotes = "system|" + req.get("un").toString().toLowerCase() + "|" + tempDateNow.toInstant().toString() + "| Updated task user notes||";
-            userNotes = req.get("un").toString() + "|" + task.getTaskState() + "|" + tempDateNow.toInstant().toString()+ "|" + req.get("userNotes") + "||";
-        }
-        if(systemNotes != null){
-            task.setTaskNotes(task.getTaskNotes().concat(systemNotes));
-        }
-        if(userNotes != null){
-            task.setTaskNotes(task.getTaskNotes().concat(userNotes));
-        }
+        // String systemNotes = null;
+        // String userNotes = null;
+        // //task state 
+        // //Check current task state as open
+        // System.out.println(task.getTaskState());
+        // if(!task.getTaskState().toLowerCase().equals("doing")){
+        //     response.put("success", false);
+        //     response.put("message", "Current task is not in Doing state");
+        //     return response;
+        // }
+        // if(task.getTaskState().toLowerCase() != req.get("taskState").toString().toLowerCase()){
+        //     systemNotes = "system|" + req.get("un").toString().toLowerCase() + "|" + tempDateNow.toInstant().toString() + "| Updated task state||";
+        //     task.setTaskState(req.get("taskState").toString());
+        // }
+        // if(req.get("userNotes") != null){
+        //     systemNotes = "system|" + req.get("un").toString().toLowerCase() + "|" + tempDateNow.toInstant().toString() + "| Updated task user notes||";
+        //     userNotes = req.get("un").toString() + "|" + task.getTaskState() + "|" + tempDateNow.toInstant().toString()+ "|" + req.get("userNotes") + "||";
+        // }
+        // if(systemNotes != null){
+        //     task.setTaskNotes(task.getTaskNotes().concat(systemNotes));
+        // }
+        // if(userNotes != null){
+        //     task.setTaskNotes(task.getTaskNotes().concat(userNotes));
+        // }
 
-        //Update task creator
-        task.setTaskOwner(req.get("un").toString());
+    //     //Update task creator
+    //     task.setTaskOwner(req.get("un").toString());
 
-        //update task
-        Task updateTask = new Task(task, application, newPlan);
-        boolean isUpdated = taskRepository.updateTask(updateTask);
+    //     //update task
+    //     Task updateTask = new Task(task, application, newPlan);
+    //     boolean isUpdated = taskRepository.updateTask(updateTask);
         
-        //Return
-        if(isUpdated){
-            response.put("success", true);
-            // emailService.sendEmail("tmspl0606@gmail.com", "Promote task " + req.get("taskId").toString() +" to done", "Promote task " + req.get("taskId").toString() +" to done");
-            return response;
-        }
+    //     //Return
+    //     if(isUpdated){
+    //         response.put("success", true);
+    //         // emailService.sendEmail("tmspl0606@gmail.com", "Promote task " + req.get("taskId").toString() +" to done", "Promote task " + req.get("taskId").toString() +" to done");
+    //         return response;
+    //     }
 
-        response.put("success", false);
-        return response;
-    }
+    //     response.put("success", false);
+    //     return response;
+    // }
 
 
 }
