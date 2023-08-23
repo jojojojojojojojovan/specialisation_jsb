@@ -17,10 +17,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tmsapp.tms.Entity.Account;
 import com.tmsapp.tms.Entity.Application;
 import com.tmsapp.tms.Entity.Plan;
 import com.tmsapp.tms.Entity.Task;
 import com.tmsapp.tms.Entity.TaskDTO;
+import com.tmsapp.tms.Repository.AccountRepository;
 import com.tmsapp.tms.Repository.ApplicationRepository;
 import com.tmsapp.tms.Repository.PlanRepository;
 import com.tmsapp.tms.Repository.TaskRepository;
@@ -37,6 +39,9 @@ public class TaskService {
 
     @Autowired
     private ApplicationRepository applicationRepository;
+
+    @Autowired
+    AccountRepository accountRepository;
 
     @Autowired
     private PlanRepository planRepository;
@@ -533,8 +538,15 @@ public class TaskService {
 
         boolean isUpdated = taskRepository.updateTask(updateTask);
 
+        String username = req.get("un").toString();
+        System.out.println("username " + username);
+        String email = accountRepository.getEmail(username);
+        System.out.println("email " + email);
+
+        System.out.println("true " + (req.get("taskState").equals("done") && isUpdated));
+
         if(req.get("taskState").equals("done") && isUpdated){
-            emailService.sendEmail("tmspl0606@gmail.com", "Promote task " + req.get("taskId").toString() +" to done", "Promote task " + req.get("taskId").toString() +" to done");
+            emailService.sendEmail(email, "Promote task " + req.get("taskId").toString() +" to done", "Promote task " + req.get("taskId").toString() +" to done");
         }
         
         //Return

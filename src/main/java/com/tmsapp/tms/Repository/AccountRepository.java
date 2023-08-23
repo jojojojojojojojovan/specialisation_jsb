@@ -118,6 +118,39 @@ public class AccountRepository {
         return account;
     }
 
+    public String getEmail(String username) {
+        Transaction transaction = null;
+        String email = null;
+        
+        try {
+            session = hibernateUtil.getSessionFactory().openSession();
+            transaction = session.beginTransaction();
+            
+            String hql = "SELECT email FROM Account WHERE username=:un";
+            Query<String> query = session.createQuery(hql, String.class);
+            query.setParameter("un", username);
+            
+            email = query.getSingleResult();
+            
+            transaction.commit();
+        } catch (NoResultException e) {
+            email = null;
+            e.printStackTrace();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+    
+        return email;
+    }
+    
+
     public List<Accgroup> getGroupsByUsername(String username){
         Transaction transaction = null;
         List<Accgroup> groups = null;
