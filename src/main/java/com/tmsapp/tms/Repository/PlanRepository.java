@@ -112,7 +112,7 @@ public class PlanRepository {
             session = hibernateUtil.getSessionFactory().openSession();
             transaction =session.beginTransaction();
 
-            String hql = "SELECT new Plan(p.Plan_MVP_name, p.Plan_startLocalDateTime, p.Plan_endLocalDateTime, p.Colour) FROM Plan p INNER JOIN p.application a WHERE a.App_Acronym=:appAcronym";
+            String hql = "SELECT new Plan(p.Plan_MVP_name, p.Plan_startDate, p.Plan_endDate, p.Colour) FROM Plan p INNER JOIN p.application a WHERE a.App_Acronym=:appAcronym";
             Query<Plan> query = session.createQuery(hql, Plan.class);
             query.setParameter("appAcronym", appAcronym);
             plans = query.getResultList();
