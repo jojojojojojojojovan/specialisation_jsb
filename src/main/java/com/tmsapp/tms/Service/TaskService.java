@@ -450,8 +450,6 @@ public class TaskService {
         // Application application = applicationRepository.getApplication(task.getTaskAppAcronym());
 
         String id = req.get("taskId").toString();
-        String un = req.get("un").toString().toLowerCase();
-        String gn = req.get("gn").toString().toLowerCase();
 
         Application application;
         // Plan newPlan;
