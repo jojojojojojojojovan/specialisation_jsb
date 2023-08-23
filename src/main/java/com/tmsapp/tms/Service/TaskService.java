@@ -500,7 +500,7 @@ public class TaskService {
                 return response;
             }
 
-            systemNotes = "||system|" + req.get("un").toString().toLowerCase() + "|" + tempDateNow.toInstant().toString() + "| Updated task state";
+            systemNotes = "||system|" + req.get("un").toString().toLowerCase() + "|" + tempDateNow.toString() + "| Updated task state";
             task.setTaskState(req.get("taskState").toString());
         }
 
