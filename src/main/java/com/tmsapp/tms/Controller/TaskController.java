@@ -132,21 +132,5 @@ public class TaskController {
         System.out.println("response " + response);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
-
-
-    // @PostMapping(path = "/tm-update/taskToDoToDoing")
-    // public ResponseEntity<Map<String, Object>> TMEditTaskToDoToDoing(@RequestBody Map<String, Object> req) {
-    //     Map<String, Object> response = new HashMap<>();
-    //     response.putAll(taskService.TMEditTaskToDoToDoing(req));
-    //     return ResponseEntity.status(HttpStatus.OK).body(response);
-    // }
-    
-    // @PostMapping(path = "/tm-update/taskDoingToDone")
-    // public ResponseEntity<Map<String, Object>> TMEditTaskDoingToDone(@RequestBody Map<String, Object> req) {
-    //     Map<String, Object> response = new HashMap<>();
-    //     response.putAll(taskService.TMEditTaskDoingToDone(req));
-    //     return ResponseEntity.status(HttpStatus.OK).body(response);
-    // }
-
     
 }

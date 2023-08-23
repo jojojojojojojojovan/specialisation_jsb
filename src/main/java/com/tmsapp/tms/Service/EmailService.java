@@ -14,10 +14,6 @@ public class EmailService {
     public void sendEmail(String email_to, String email_subject, String email_body) {
     SimpleMailMessage message = new SimpleMailMessage();
 
-    // email_to="tmspl0606@gmail.com";
-    // email_subject="Promoted task to done";
-    // email_body="Promoted task to done";
-
     message.setTo(email_to);
     message.setSubject(email_subject);
     message.setText(email_body);
