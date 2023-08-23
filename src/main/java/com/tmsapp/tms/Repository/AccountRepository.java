@@ -12,6 +12,7 @@ import org.hibernate.Hibernate;
 import org.hibernate.query.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.exception.GenericJDBCException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -102,7 +103,12 @@ public class AccountRepository {
             if (e.getCause() instanceof org.hibernate.TransactionException) {
                 // Handle the specific exception for duplicate key violation
                 // result = false;
-            } else {
+            }
+            else if (e.getCause() instanceof GenericJDBCException) {
+                // Handle the specific exception for duplicate key violation
+                // result = false;
+            }  
+            else {
                 if (transaction != null) {
                     transaction.rollback();
                 }
