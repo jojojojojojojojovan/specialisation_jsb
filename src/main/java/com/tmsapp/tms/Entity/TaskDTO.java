@@ -19,7 +19,7 @@ public class TaskDTO {
 
     private String taskOwner;
 
-    private LocalDate taskCreateLocalDateTime;
+    private LocalDate taskCreateDate;
    
     private String taskPlan;
 
@@ -33,7 +33,7 @@ public class TaskDTO {
         this.taskState = task.getTaskState();
         this.taskCreator = task.getTaskCreator();
         this.taskOwner = task.getTaskOwner();
-        this.taskCreateLocalDateTime = task.getTaskCreateLocalDateTime();
+        this.taskCreateDate = task.getTaskCreateDate();
         this.taskPlan = (task.getTaskPlan() != null) ? task.getTaskPlan().getPlan_MVP_name() : null;
         this.taskAppAcronym = (task.getTaskAppAcronym() != null) ? task.getTaskAppAcronym().getApp_Acronym() : null;
     }
@@ -99,12 +99,12 @@ public class TaskDTO {
         this.taskOwner = taskOwner;
     }
 
-    public LocalDate getTaskCreateLocalDateTime() {
-        return taskCreateLocalDateTime;
+    public LocalDate getTaskCreateDate() {
+        return taskCreateDate;
     }
 
-    public void setTaskCreateLocalDateTime(LocalDate taskCreateLocalDateTime) {
-        this.taskCreateLocalDateTime = taskCreateLocalDateTime;
+    public void setTaskCreateDate(LocalDate taskCreateDate) {
+        this.taskCreateDate = taskCreateDate;
     }
 
     public String getTaskPlan() {

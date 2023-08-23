@@ -42,7 +42,7 @@ public class Task {
     private String taskOwner;
 
     @Column
-    private LocalDate taskCreateLocalDateTime;
+    private LocalDate taskCreateDate;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JsonIgnore
@@ -66,7 +66,7 @@ public class Task {
                 @JsonProperty("taskState") String taskState,
                 @JsonProperty("taskCreator") String taskCreator,
                 @JsonProperty("taskOwner") String taskOwner,
-                @JsonProperty("taskCreateLocalDateTime") LocalDate taskCreateLocalDateTime) {
+                @JsonProperty("taskCreateDate") LocalDate taskCreateDate) {
         this.taskName = taskName;
         this.taskDescription = taskDescription;
         this.taskNotes = taskNotes;
@@ -76,7 +76,7 @@ public class Task {
         this.taskState = taskState;
         this.taskCreator = taskCreator;
         this.taskOwner = taskOwner;
-        this.taskCreateLocalDateTime = taskCreateLocalDateTime;
+        this.taskCreateDate = taskCreateDate;
     }
 
     public Task() {
@@ -92,7 +92,7 @@ public class Task {
         this.taskState = taskDTO.getTaskState();
         this.taskCreator = taskDTO.getTaskCreator();
         this.taskOwner = taskDTO.getTaskOwner();
-        this.taskCreateLocalDateTime = taskDTO.getTaskCreateLocalDateTime();
+        this.taskCreateDate = taskDTO.getTaskCreateDate();
     }
 
     public String getTaskName() {
@@ -167,12 +167,12 @@ public class Task {
         this.taskOwner = taskOwner;
     }
 
-    public LocalDate getTaskCreateLocalDateTime() {
-        return taskCreateLocalDateTime;
+    public LocalDate getTaskCreateDate() {
+        return taskCreateDate;
     }
 
-    public void setTaskCreateLocalDateTime(LocalDate taskCreateLocalDateTime) {
-        this.taskCreateLocalDateTime = taskCreateLocalDateTime;
+    public void setTaskCreateDate(LocalDate taskCreateDate) {
+        this.taskCreateDate = taskCreateDate;
     }
     
 }

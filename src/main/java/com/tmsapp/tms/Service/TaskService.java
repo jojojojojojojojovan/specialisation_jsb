@@ -157,7 +157,7 @@ public class TaskService {
         applicationRepository.updateApplication(application);
 
         //create date
-        task.setTaskCreateLocalDateTime(tempNow);
+        task.setTaskCreateDate(tempNow);
         if(task.getTaskState() == null) {
             task.setTaskState("open");
         } 
