@@ -1,5 +1,6 @@
 package com.tmsapp.tms.Entity;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -41,7 +42,7 @@ public class Task {
     private String taskOwner;
 
     @Column
-    private Date taskCreateDate;
+    private LocalDate taskCreateLocalDateTime;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JsonIgnore
@@ -65,7 +66,7 @@ public class Task {
                 @JsonProperty("taskState") String taskState,
                 @JsonProperty("taskCreator") String taskCreator,
                 @JsonProperty("taskOwner") String taskOwner,
-                @JsonProperty("taskCreateDate") Date taskCreateDate) {
+                @JsonProperty("taskCreateLocalDateTime") LocalDate taskCreateLocalDateTime) {
         this.taskName = taskName;
         this.taskDescription = taskDescription;
         this.taskNotes = taskNotes;
@@ -75,7 +76,7 @@ public class Task {
         this.taskState = taskState;
         this.taskCreator = taskCreator;
         this.taskOwner = taskOwner;
-        this.taskCreateDate = taskCreateDate;
+        this.taskCreateLocalDateTime = taskCreateLocalDateTime;
     }
 
     public Task() {
@@ -91,7 +92,7 @@ public class Task {
         this.taskState = taskDTO.getTaskState();
         this.taskCreator = taskDTO.getTaskCreator();
         this.taskOwner = taskDTO.getTaskOwner();
-        this.taskCreateDate = taskDTO.getTaskCreateDate();
+        this.taskCreateLocalDateTime = taskDTO.getTaskCreateLocalDateTime();
     }
 
     public String getTaskName() {
@@ -166,12 +167,12 @@ public class Task {
         this.taskOwner = taskOwner;
     }
 
-    public Date getTaskCreateDate() {
-        return taskCreateDate;
+    public LocalDate getTaskCreateLocalDateTime() {
+        return taskCreateLocalDateTime;
     }
 
-    public void setTaskCreateDate(Date taskCreateDate) {
-        this.taskCreateDate = taskCreateDate;
+    public void setTaskCreateLocalDateTime(LocalDate taskCreateLocalDateTime) {
+        this.taskCreateLocalDateTime = taskCreateLocalDateTime;
     }
     
 }

@@ -3,6 +3,7 @@ package com.tmsapp.tms.Service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -55,16 +56,16 @@ public class PlanService {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Plan plan;
         try {
-            plan = new Plan(req.get("planName").toString(), dateFormat.parse(req.get("startDate").toString()), dateFormat.parse(req.get("endDate").toString()), req.get("colour").toString());
+            plan = new Plan(req.get("planName").toString(), LocalDate.parse(req.get("startDate").toString()), LocalDate.parse(req.get("endDate").toString()), req.get("colour").toString());
             plan.setApplication(application);
-        } catch (ParseException e) {    
+        } catch (Exception e) {    
             result.put("success", false);
             return result;
         }
 
         //Validate: plan start date and end date must be between application start date and end date
         
-        //Date check 1
+        //LocalDate check 1
         int planStartDateCompareEndDate = plan.getPlan_startDate().compareTo(plan.getPlan_endDate());
         if(planStartDateCompareEndDate > 0){
             result.put("success", false);
@@ -72,7 +73,7 @@ public class PlanService {
             return result;
         }
 
-        //Date check 2
+        //LocalDate check 2
         int appStartDateComparePlanStartDate = application.getApp_startDate().compareTo(plan.getPlan_startDate());
         if(appStartDateComparePlanStartDate > 0){
             result.put("success", false);
@@ -80,7 +81,7 @@ public class PlanService {
             return result;
         }
 
-        //Date check 3
+        //LocalDate check 3
         int appEndDateComparePlanStartDate = application.getApp_endDate().compareTo(plan.getPlan_startDate());
         if(appEndDateComparePlanStartDate < 0 ){
             result.put("success", false);
@@ -88,7 +89,7 @@ public class PlanService {
             return result;
         }
 
-        //Date check 4
+        //LocalDate check 4
         int appEndDateComparePlanEndDate = application.getApp_endDate().compareTo(plan.getPlan_endDate());
         if(appEndDateComparePlanEndDate < 0 ){
             result.put("success", false);

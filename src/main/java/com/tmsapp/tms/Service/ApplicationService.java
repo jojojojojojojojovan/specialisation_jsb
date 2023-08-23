@@ -2,6 +2,7 @@ package com.tmsapp.tms.Service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -53,12 +54,12 @@ public class ApplicationService {
 
         //Check date
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        Date checkStartDate = null;
-        Date checkEndDate = null;
+        LocalDate checkStartDate = null;
+        LocalDate checkEndDate = null;
 
         try{
-            checkStartDate = dateFormat.parse(req.get("startDate").toString());
-            checkEndDate = dateFormat.parse(req.get("endDate").toString());
+            checkStartDate = LocalDate.parse(req.get("startDate").toString());
+            checkEndDate = LocalDate.parse(req.get("endDate").toString());
             if(checkStartDate != null && checkEndDate != null){
                 int compareDateResult = checkStartDate.compareTo(checkEndDate);
                 if(compareDateResult > 0){
@@ -67,7 +68,7 @@ public class ApplicationService {
                     return result;
                 }
             }
-        }catch(ParseException e){
+        }catch(Exception e){
             result.put("success", false);
             result.put("message", "invalid date format");
             return result;
@@ -174,6 +175,7 @@ public class ApplicationService {
         }
         try {
             Application application = applicationRepository.getApplication(req.get("appAcronym").toString());
+            System.out.println(application.getApp_startDate());
 
             if(application == null) {
                 result.put("success", false);
@@ -220,11 +222,11 @@ public class ApplicationService {
         if(req.get("endDate") != null){
             String dateString = req.get("endDate").toString();
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            Date temp = dateFormat.parse(dateString);
+            LocalDate temp = LocalDate.parse(dateString);
 
-            // Date temp = (Date) req.get("endDate");
+            // LocalDate temp = (LocalDate) req.get("endDate");
             System.out.println("temp " + temp);
-            Date tempStartDate = application.getApp_startDate();
+            LocalDate tempStartDate = application.getApp_startDate();
             int dateCompare = tempStartDate.compareTo(temp);
             //Start date is after end date
             if(dateCompare > 0 ){

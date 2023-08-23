@@ -1,5 +1,6 @@
 package com.tmsapp.tms.Entity;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -7,8 +8,8 @@ public class ApplicationDTO {
     private String App_Acronym;
     private String App_Description;
     private Integer App_Rnumber;
-    private Date App_startDate;
-    private Date App_endDate;
+    private LocalDate App_startDate;
+    private LocalDate App_endDate;
     private String App_permit_Create;
     private String App_permit_Open;
     private String App_permit_toDoList;
@@ -18,8 +19,8 @@ public class ApplicationDTO {
     public ApplicationDTO (String app_Acronym, 
                              String app_Description, 
                              int app_Rnumber, 
-                             Date app_startDate,
-                             Date app_endDate, 
+                             LocalDate app_startDate,
+                             LocalDate app_endDate, 
                              String app_permit_Create, 
                              String app_permit_Open, 
                              String app_permit_toDoList,
@@ -64,19 +65,19 @@ public class ApplicationDTO {
         App_Rnumber = app_Rnumber;
     }
 
-    public Date getApp_startDate() {
+    public LocalDate getApp_startDate() {
         return App_startDate;
     }
 
-    public void setApp_startDate(Date app_startDate) {
+    public void setApp_startDate(LocalDate app_startDate) {
         App_startDate = app_startDate;
     }
 
-    public Date getApp_endDate() {
+    public LocalDate getApp_endDate() {
         return App_endDate;
     }
 
-    public void setApp_endDate(Date app_endDate) {
+    public void setApp_endDate(LocalDate app_endDate) {
         App_endDate = app_endDate;
     }
 
