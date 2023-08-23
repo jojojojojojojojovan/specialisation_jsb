@@ -80,10 +80,16 @@ public class ApplicationService {
         String doing = null;
         String done = null;
         String create = null;
+        String description = null;
         if(req.get("open") != null){
             Accgroup tempgroup = accgroupRepository.getGroupByGroupName(req.get("open").toString());
             if(tempgroup != null){
                 open = tempgroup.getGroupName();
+            }
+            else{
+                result.put("success", false);
+                result.put("message", "invalid group");
+                return result;
             }
         }
         if(req.get("toDo") != null){
@@ -91,11 +97,21 @@ public class ApplicationService {
             if(tempgroup != null){
                 toDo = tempgroup.getGroupName();
             }
+            else{
+                result.put("success", false);
+                result.put("message", "invalid group");
+                return result;
+            }
         }
         if(req.get("doing") != null){
             Accgroup tempgroup = accgroupRepository.getGroupByGroupName(req.get("doing").toString());
             if(tempgroup != null){
                 doing = tempgroup.getGroupName();
+            }
+            else{
+                result.put("success", false);
+                result.put("message", "invalid group");
+                return result;
             }
         }
         if(req.get("done") != null){
@@ -103,12 +119,25 @@ public class ApplicationService {
             if(tempgroup != null){
                 done = tempgroup.getGroupName();
             }
+            else{
+                result.put("success", false);
+                result.put("message", "invalid group");
+                return result;
+            }
         }
         if(req.get("create") != null){
             Accgroup tempgroup = accgroupRepository.getGroupByGroupName(req.get("create").toString());
             if(tempgroup != null){
                 create = tempgroup.getGroupName();
             }
+            else{
+                result.put("success", false);
+                result.put("message", "invalid group");
+                return result;
+            }
+        }
+        if (req.get("description") != null){
+            description = req.get("description").toString();
         }
 
         //Check r_number
@@ -121,7 +150,7 @@ public class ApplicationService {
 
         System.out.println("description: " + req.get("description").toString());
         //Construct application
-        Application application = new Application(req.get("acronym").toString(), req.get("description").toString(), Integer.valueOf(req.get("rnumber").toString()), checkStartDate, checkEndDate, create, open, toDo, doing, done);
+        Application application = new Application(req.get("acronym").toString(), description, Integer.valueOf(req.get("rnumber").toString()), checkStartDate, checkEndDate, create, open, toDo, doing, done);
         Map<String, Object> isCreated = applicationRepository.createApplication(application);
         if((Boolean) isCreated.get("success")){
             result.put("success", true);

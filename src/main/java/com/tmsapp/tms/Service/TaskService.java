@@ -230,30 +230,24 @@ public class TaskService {
 
     public Map<String, Object> PMEditTask (Map<String, Object> req){
         Map<String, Object> response = new HashMap<>();
-        String id,un,gn,state;
+        String id,un,state;
         //Check for required fields 
-        if(req.get("taskId") == null || req.get("un") == null || req.get("gn") == null || req.get("taskState") == null){
+        // System.out.println(req.get("taskId").toString());
+        System.out.println(req.get("requestBody"));
+        // System.out.println(req.get("taskState").toString());
+        if(req.get("taskId") == null || req.get("un") == null || req.get("taskState") == null){
             response.put("success", false);
             response.put("message", "mandatory fields missing");
             return response;
         } else{
             id = req.get("taskId").toString();
             un = req.get("un").toString().toLowerCase();
-            gn = req.get("gn").toString().toLowerCase();
             state = req.get("taskState").toString().toLowerCase();
             if (!state.equals("open") && !state.equals("todo")){
                 response.put("success", false);
                 response.put("message", "state input invalid");
                 return response;
             }
-        }
-        
-        //check if user is pm 
-        boolean isPM = checkGroup.checkgroup(un,gn);
-        if(!isPM){
-            response.put("success", false);
-            response.put("message", "unauthorized (NOT PM)");
-            return response;
         }
 
         //Get application and Task
@@ -273,6 +267,19 @@ public class TaskService {
                 return response;
             }
             application = applicationRepository.getApplication(task.getTaskAppAcronym());
+            if(application !=null){
+                //check if user is pm 
+                boolean isPM = checkGroup.checkgroup(un,application.getApp_permit_Open());
+                if(!isPM){
+                    response.put("success", false);
+                    response.put("message", "unauthorized (NOT PM)");
+                    return response;
+                }
+            }else{
+                response.put("success", false);
+                response.put("message", "application not found");
+                return response;
+            }
         }
 
         //Check if plan exisit if req.get("taskPlan") != null
@@ -285,7 +292,7 @@ public class TaskService {
             }
             task.setTaskPlan(plan.getPlan_MVP_name());
         }else{
-            plan = planRepository.getPlansByPlanName(task.getTaskPlan());
+            plan = null;
         }
 
         //Get current date
@@ -330,7 +337,7 @@ public class TaskService {
     public Map<String, Object> PLEditTask (Map<String, Object> req){
         Map<String, Object> response = new HashMap<>();
         //Check for required fields 
-        if(req.get("taskId") == null || req.get("un") == null || req.get("gn") == null || req.get("taskState") == null){//} || req.get("acronym") == null){
+        if(req.get("taskId") == null || req.get("un") == null || req.get("taskState") == null){//} || req.get("acronym") == null){
             response.put("success", false);
             response.put("message", "mandatory fields missing");
             return response;
@@ -366,7 +373,7 @@ public class TaskService {
             }
             task.setTaskPlan(newPlan.getPlan_MVP_name());
         }else{
-            newPlan = planRepository.getPlansByPlanName(task.getTaskPlan());
+            newPlan = null;
         }
 
         //Get current date
@@ -384,6 +391,14 @@ public class TaskService {
             return response;
         }
         if(task.getTaskState().toLowerCase() != req.get("taskState").toString().toLowerCase()){
+            
+            if(req.get("taskState").toString().equals("doing") || req.get("taskState").toString().equals("done") || req.get("taskState").toString().equals("closed")){
+                //do nothing
+            }else{
+                response.put("success", false);
+                response.put("message", "input task state incorrect");
+                return response;
+            }
             systemNotes = "||system|" + req.get("un").toString().toLowerCase() + "|" + tempDateNow.toString() + "| Updated task state";
             task.setTaskState(req.get("taskState").toString());
         }
@@ -438,8 +453,6 @@ public class TaskService {
         // Application application = applicationRepository.getApplication(task.getTaskAppAcronym());
 
         String id = req.get("taskId").toString();
-        String un = req.get("un").toString().toLowerCase();
-        String gn = req.get("gn").toString().toLowerCase();
 
         Application application;
         // Plan newPlan;
