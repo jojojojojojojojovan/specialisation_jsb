@@ -86,7 +86,7 @@ public class ApplicationService {
             }
         }
         if(req.get("toDo") != null){
-            Accgroup tempgroup = accgroupRepository.getGroupByGroupName(req.get("toDo").toString());
+            Accgroup tempgroup = accgroupRepository.getGroupByGroupName(req.get("todo").toString());
             if(tempgroup != null){
                 toDo = tempgroup.getGroupName();
             }
@@ -224,7 +224,7 @@ public class ApplicationService {
         if(req.get("permitTodo") != null){
             Accgroup temp = accgroupRepository.getGroupByGroupName(req.get("permitTodo").toString());
             if(temp != null){
-                application.setApp_permit_toDo(temp.getGroupName());
+                application.setApp_permit_toDoList(temp.getGroupName());
             }
         }
         if(req.get("permitDoing") != null){

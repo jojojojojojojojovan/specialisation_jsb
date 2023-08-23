@@ -1,6 +1,8 @@
 package com.tmsapp.tms.Service;
 
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -50,7 +52,15 @@ public class PlanService {
         }
 
         //Create plan 
-        Plan plan = new Plan(req.get("planName").toString(), (Date) req.get("startDate"), (Date) req.get("endDate"), req.get("colour").toString());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Plan plan;
+        try {
+            plan = new Plan(req.get("planName").toString(), dateFormat.parse(req.get("startDate").toString()), dateFormat.parse(req.get("endDate").toString()), req.get("colour").toString());
+            plan.setApplication(application);
+        } catch (ParseException e) {    
+            result.put("success", false);
+            return result;
+        }
 
         //Validate: plan start date and end date must be between application start date and end date
         
@@ -58,13 +68,13 @@ public class PlanService {
         int planStartDateCompareEndDate = plan.getPlan_startDate().compareTo(plan.getPlan_endDate());
         if(planStartDateCompareEndDate > 0){
             result.put("success", false);
-            result.put("message", "Plan Start date is after plan end date");
+            result.put("message", "Plan Start date is before plan end date");
             return result;
         }
 
         //Date check 2
         int appStartDateComparePlanStartDate = application.getApp_startDate().compareTo(plan.getPlan_startDate());
-        if(appStartDateComparePlanStartDate < 0){
+        if(appStartDateComparePlanStartDate > 0){
             result.put("success", false);
             result.put("message", "Application start date must be before plan start date");
             return result;
