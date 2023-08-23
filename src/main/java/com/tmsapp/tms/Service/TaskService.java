@@ -438,6 +438,7 @@ public class TaskService {
             response.put("message", "mandatory fields missing");
             return response;
         }
+        String newtaskstate = req.get("taskState").toString().toLowerCase();
 
         //check if user is pm 
         boolean isTM = checkGroup.checkgroup(req.get("un").toString(), req.get("gn").toString());
@@ -464,13 +465,15 @@ public class TaskService {
             response.put("message", "Invalid task id");
             return response;
         } else{
-            //task state not in open
+            //taskid found  
+            //task state not in todo or doing
             if(!task.getTaskState().toLowerCase().equals("todo") && !task.getTaskState().toLowerCase().equals("doing")){
                 System.out.println("task.getTaskState() " + task.getTaskState());
                 response.put("success", false);
-                response.put("message", "Current task is not in " + task.getTaskState() +" state");
+                response.put("message", "Invalid Task state.Current task is in " + task.getTaskState() +" state");
                 return response;
             }
+            //task
             application = applicationRepository.getApplication(task.getTaskAppAcronym());
         }
         // if(application == null || task == null){
@@ -490,8 +493,14 @@ public class TaskService {
         System.out.println("task.getTaskState()" +task.getTaskState());
         System.out.println("req.get(\"taskState\") "  + req.get("taskState"));
 
-        if(task.getTaskState().toLowerCase() != req.get("taskState").toString().toLowerCase()){
-            systemNotes = "||system|" + req.get("un").toString().toLowerCase() + "|" + tempDateNow.toString() + "| Updated task state";
+        if(!task.getTaskState().toLowerCase().equals(req.get("taskState").toString().toLowerCase())){
+            if (!((task.getTaskState().toLowerCase().equals("todo") && newtaskstate.equals("doing")) || (task.getTaskState().toLowerCase().equals("doing") && (newtaskstate.equals("done") || newtaskstate.equals("todo"))))){
+                response.put("success", false);
+                response.put("message", "Invalid Task state update. " + task.getTaskState() + " state cannot be updated to " + req.get("taskState").toString() + " state");
+                return response;
+            }
+
+            systemNotes = "||system|" + req.get("un").toString().toLowerCase() + "|" + tempDateNow.toInstant().toString() + "| Updated task state";
             task.setTaskState(req.get("taskState").toString());
         }
 
