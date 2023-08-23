@@ -178,6 +178,7 @@ public class TaskService {
     public TaskDTO getTaskById(String taskId) {
         TaskDTO task = new TaskDTO();
         try {
+            System.out.println("task id task service " + taskId);
             task = taskRepository.getTaskById(taskId);
         }
         catch (Error err) {
@@ -414,8 +415,10 @@ public class TaskService {
 
     public Map<String, Object> TMEditTask (Map<String, Object> req){
         Map<String, Object> response = new HashMap<>();
+        System.out.println(" inside tm edit task service ");
         //Check for required fields 
-        if(req.get("taskId") == null || req.get("un") == null || req.get("gn") == null || req.get("taskState") == null || req.get("taskOwner") == null){ //|| req.get("acronym")==null){
+        //req.get("taskOwner") == null ||
+        if(req.get("taskId") == null || req.get("un") == null || req.get("gn") == null || req.get("taskState") == null || req.get("acronym")==null){
             response.put("success", false);
             response.put("message", "mandatory fields missing");
             return response;

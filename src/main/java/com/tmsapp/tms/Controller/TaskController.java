@@ -124,8 +124,9 @@ public class TaskController {
 
     //INPUT: taskId, un, gn, userNotes(OPTIONAL), taskState, acronym
 
-    @PostMapping(path = "/tm-update/task")
+    @PostMapping(path = "/team-update/task")
     public ResponseEntity<Map<String, Object>> TMEditTask(@RequestBody Map<String, Object> req) {
+        System.out.println(" inside team update task");
         Map<String, Object> response = new HashMap<>();
         response.putAll(taskService.TMEditTask(req));
         System.out.println("response " + response);
