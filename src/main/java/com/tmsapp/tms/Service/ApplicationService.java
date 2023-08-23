@@ -147,7 +147,7 @@ public class ApplicationService {
             return result;
         }
 
-        System.out.println("description: " + req.get("description").toString());
+        // System.out.println("description: " + req.get("description").toString());
         //Construct application
         Application application = new Application(req.get("acronym").toString(), description, Integer.valueOf(req.get("rnumber").toString()), checkStartDate, checkEndDate, create, open, toDo, doing, done);
         Map<String, Object> isCreated = applicationRepository.createApplication(application);
@@ -227,7 +227,7 @@ public class ApplicationService {
             Date tempStartDate = application.getApp_startDate();
             int dateCompare = tempStartDate.compareTo(temp);
             //Start date is after end date
-            if(dateCompare >= 0 ){
+            if(dateCompare > 0 ){
                 result.put("success", false);
                 return result;
 
@@ -291,7 +291,6 @@ public class ApplicationService {
         List<Application> applications = applicationRepository.getAllApplication();
         result.put("applications", applications);
         result.put("success",true);
-
         return result;
     } 
 }
