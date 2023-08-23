@@ -449,7 +449,7 @@ public class TaskService {
             return response;
         } else{
             //task state not in open
-            if(!task.getTaskState().toLowerCase().equals("to do") && !task.getTaskState().toLowerCase().equals("doing")){
+            if(!task.getTaskState().toLowerCase().equals("todo") && !task.getTaskState().toLowerCase().equals("doing")){
                 System.out.println("task.getTaskState() " + task.getTaskState());
                 response.put("success", false);
                 response.put("message", "Current task is not in " + task.getTaskState() +" state");
@@ -481,7 +481,7 @@ public class TaskService {
 
         if(req.get("userNotes") != null){
             systemNotes = "||system|" + req.get("un").toString().toLowerCase() + "|" + tempDateNow.toInstant().toString() + "| Updated task user notes||";
-            userNotes = req.get("un").toString() + "|" + task.getTaskState() + "|" + tempDateNow.toInstant().toString()+ "|" + req.get("userNotes");
+            userNotes = req.get("un").toString() + "|" + task.getTaskState() + "|" + tempDateNow.toInstant().toString()+ "|" + req.get("userNotes").toString();
         }
 
         if(systemNotes != null){
