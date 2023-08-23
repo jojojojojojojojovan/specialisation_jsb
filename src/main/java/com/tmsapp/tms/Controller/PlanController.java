@@ -47,7 +47,7 @@ public class PlanController {
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
-    //INPUT:
+    //INPUT: appAcronym
     @PostMapping(path = "/all-plan/app")
     public ResponseEntity<Map<String, Object>> getAllPlansByApp(@RequestBody Map<String, Object> req) {
         Map<String, Object> result = new HashMap<>();
