@@ -26,7 +26,7 @@ public class PlanController {
     PlanService planService;
 
     //INPUT: un, appAcronym, plan name, start date, end date, colour
-    @PutMapping(path = "/createPlan")
+    @PostMapping(path = "/createPlan")
     public ResponseEntity<Map<String, Object>> createPlan(@RequestBody Map<String, Object> req) {
         Map<String, Object> result = new HashMap<>();
 
@@ -47,7 +47,7 @@ public class PlanController {
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
-    //INPUT:
+    //INPUT: appAcronym
     @PostMapping(path = "/all-plan/app")
     public ResponseEntity<Map<String, Object>> getAllPlansByApp(@RequestBody Map<String, Object> req) {
         Map<String, Object> result = new HashMap<>();

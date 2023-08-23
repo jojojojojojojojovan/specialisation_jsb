@@ -1,5 +1,6 @@
 package com.tmsapp.tms.Entity;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -25,11 +26,11 @@ public class Plan {
     @Column(length = 199, nullable = false)
     private String Plan_MVP_name;
 
-    @Column(columnDefinition = "DATE", nullable = false)
-    private Date Plan_startDate;
+    @Column(columnDefinition = "TIMESTAMP", nullable = false)
+    private LocalDate Plan_startDate;
 
-    @Column(columnDefinition = "DATE", nullable = false)
-    private Date Plan_endDate;
+    @Column(columnDefinition = "TIMESTAMP", nullable = false)
+    private LocalDate Plan_endDate;
 
     @Column(nullable = false)
     private String Colour;
@@ -45,8 +46,8 @@ public class Plan {
 
     @JsonCreator
     public Plan(@JsonProperty("plan_MVP_name") String plan_MVP_name, 
-                @JsonProperty("plan_startDate") Date plan_startDate, 
-                @JsonProperty("plan_endDate") Date plan_endDate,
+                @JsonProperty("plan_startDate") LocalDate plan_startDate, 
+                @JsonProperty("plan_endDate") LocalDate plan_endDate,
                 @JsonProperty("colour") String colour) {
         Plan_MVP_name = plan_MVP_name;
         Plan_startDate = plan_startDate;
@@ -81,19 +82,19 @@ public class Plan {
         Plan_MVP_name = plan_MVP_name;
     }
 
-    public Date getPlan_startDate() {
+    public LocalDate getPlan_startDate() {
         return Plan_startDate;
     }
 
-    public void setPlan_startDate(Date plan_startDate) {
+    public void setPlan_startDate(LocalDate plan_startDate) {
         Plan_startDate = plan_startDate;
     }
 
-    public Date getPlan_endDate() {
+    public LocalDate getPlan_endDate() {
         return Plan_endDate;
     }
 
-    public void setPlan_endDate(Date plan_endDate) {
+    public void setPlan_endDate(LocalDate plan_endDate) {
         Plan_endDate = plan_endDate;
     }
 

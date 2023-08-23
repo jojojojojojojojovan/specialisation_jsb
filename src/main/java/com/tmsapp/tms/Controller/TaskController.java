@@ -34,13 +34,13 @@ public class TaskController {
     @Autowired
     Checkgroup checkgroup;
 
+    //INPUT: taskName, taskDescription(optional), taskNotes(optional), taskPlan(optional), taskAppAcronym, taskCreator, taskOwner
     @PostMapping(path = "/createTask")
     public ResponseEntity<Map<String, Object>> createTask(@RequestBody TaskDTO task, @CookieValue("authToken") String jwtToken) {
 
         Map<String, Object> response = new HashMap<>();
         try {
-            taskService.createTask(task, jwtToken);
-            response.put("success", true);
+            response.putAll(taskService.createTask(task, jwtToken));
         }
         catch(Exception e) {
             response.put("success", false);
@@ -65,7 +65,7 @@ public class TaskController {
         return ResponseEntity.ok(response);
     }
 
-    //get task by plan
+    //get task by plan INPUT: planName
     @PostMapping(path = "/getAllTask/plan")
     public ResponseEntity<List<TaskDTO>> getTaskByPlan(@RequestBody Map<String, Object> req) {
         String taskPlan = (String) req.get("planName");
@@ -75,7 +75,7 @@ public class TaskController {
         return ResponseEntity.ok(tasksDTO);
     }
 
-    //get task by application
+    //get task by application INPUT: appAcronym
     @PostMapping(path = "/all-task/app")
     public ResponseEntity<Map<String, Object>> getTaskByApplication(@RequestBody Map<String, Object> req,  @CookieValue("authToken") String jwtToken) {
         Map<String, Object> response = new HashMap<>();
@@ -98,7 +98,7 @@ public class TaskController {
         return ResponseEntity.ok(task);
     }
 
-    //INPUT: taskId, un, gn, userNotes(OPTIONAL), taskState, taskPlan(OPTIONAL)
+    //INPUT: taskId, un, userNotes(OPTIONAL), taskState, taskPlan(OPTIONAL)
     @PostMapping(path = "/PMEditTask")
     public ResponseEntity<Map<String, Object>> PMEditTask(@RequestBody Map<String, Object> req) {
         Map<String, Object> response = new HashMap<>();
@@ -106,7 +106,7 @@ public class TaskController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    //INPUT: taskId, un, gn, userNotes(OPTIONAL), taskState, acronym, taskPlan(OPTIONAL)
+    //INPUT: taskId, un, userNotes(OPTIONAL), taskState, taskPlan(OPTIONAL)
     @PostMapping(path = "/PLEditTask")
     public ResponseEntity<Map<String, Object>> PLEditTask(@RequestBody Map<String, Object> req) {
         Map<String, Object> response = new HashMap<>();

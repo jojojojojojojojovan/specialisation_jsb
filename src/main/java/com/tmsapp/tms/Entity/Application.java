@@ -1,5 +1,6 @@
 package com.tmsapp.tms.Entity;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -30,11 +31,11 @@ public class Application {
     @Column(nullable = true)
     private Integer App_Rnumber;
     
-    @Column(nullable = true, columnDefinition = "DATE")
-    private Date App_startDate;
+    @Column(nullable = true, columnDefinition = "TIMESTAMP")
+    private LocalDate App_startDate;
 
-    @Column(nullable = true, columnDefinition = "DATE")
-    private Date App_endDate;
+    @Column(nullable = true, columnDefinition = "TIMESTAMP")
+    private LocalDate App_endDate;
 
     @Column(nullable = true)
     private String App_permit_Create;
@@ -63,8 +64,8 @@ public class Application {
     public Application(@JsonProperty("app_Acronym") String app_Acronym, 
                     @JsonProperty("app_Description")String app_Description, 
                     @JsonProperty("app_Rnumber") int app_Rnumber, 
-                    @JsonProperty("app_startDate") Date app_startDate,
-                    @JsonProperty("app_endDate") Date app_endDate, 
+                    @JsonProperty("app_startDate") LocalDate app_startDate,
+                    @JsonProperty("app_endDate") LocalDate app_endDate, 
                     @JsonProperty("app_permit_Create") String app_permit_Create, 
                     @JsonProperty("app_permit_Open") String app_permit_Open, 
                     @JsonProperty("app_permit_toDoList") String app_permit_toDoList,
@@ -120,19 +121,19 @@ public class Application {
         App_Rnumber = app_Rnumber;
     }
 
-    public Date getApp_startDate() {
+    public LocalDate getApp_startDate() {
         return App_startDate;
     }
 
-    public void setApp_startDate(Date app_startDate) {
+    public void setApp_startDate(LocalDate app_startDate) {
         App_startDate = app_startDate;
     }
 
-    public Date getApp_endDate() {
+    public LocalDate getApp_endDate() {
         return App_endDate;
     }
 
-    public void setApp_endDate(Date app_endDate) {
+    public void setApp_endDate(LocalDate app_endDate) {
         App_endDate = app_endDate;
     }
 

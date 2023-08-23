@@ -1,5 +1,6 @@
 package com.tmsapp.tms.Entity;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 public class TaskDTO {
@@ -18,7 +19,7 @@ public class TaskDTO {
 
     private String taskOwner;
 
-    private Date taskCreateDate;
+    private LocalDate taskCreateLocalDateTime;
    
     private String taskPlan;
 
@@ -32,7 +33,7 @@ public class TaskDTO {
         this.taskState = task.getTaskState();
         this.taskCreator = task.getTaskCreator();
         this.taskOwner = task.getTaskOwner();
-        this.taskCreateDate = task.getTaskCreateDate();
+        this.taskCreateLocalDateTime = task.getTaskCreateLocalDateTime();
         this.taskPlan = (task.getTaskPlan() != null) ? task.getTaskPlan().getPlan_MVP_name() : null;
         this.taskAppAcronym = (task.getTaskAppAcronym() != null) ? task.getTaskAppAcronym().getApp_Acronym() : null;
     }
@@ -98,12 +99,12 @@ public class TaskDTO {
         this.taskOwner = taskOwner;
     }
 
-    public Date getTaskCreateDate() {
-        return taskCreateDate;
+    public LocalDate getTaskCreateLocalDateTime() {
+        return taskCreateLocalDateTime;
     }
 
-    public void setTaskCreateDate(Date taskCreateDate) {
-        this.taskCreateDate = taskCreateDate;
+    public void setTaskCreateLocalDateTime(LocalDate taskCreateLocalDateTime) {
+        this.taskCreateLocalDateTime = taskCreateLocalDateTime;
     }
 
     public String getTaskPlan() {
