@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.persistence.PersistenceException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.exception.GenericJDBCException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -180,7 +182,20 @@ public class TaskRepository {
             
             transaction.commit();
             result = true;
-        }catch(Exception e){
+        }
+        catch (PersistenceException e) {
+            if (e.getCause() instanceof GenericJDBCException) {
+                // Handle the specific exception for duplicate key violation
+                result = false;
+            } else {
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+                e.printStackTrace();
+                result = false;
+            }
+        }
+        catch(Exception e){
             if(transaction != null){
                 transaction.rollback();
 

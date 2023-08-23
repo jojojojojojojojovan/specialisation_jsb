@@ -431,6 +431,7 @@ public class TaskService {
         return response;
     }
 
+    @Transactional
     public Map<String, Object> TMEditTask (Map<String, Object> req){
         Map<String, Object> response = new HashMap<>();
         System.out.println(" inside tm edit task service ");
@@ -534,7 +535,6 @@ public class TaskService {
 
         if(req.get("taskState").equals("done") && isUpdated){
             emailService.sendEmail("tmspl0606@gmail.com", "Promote task " + req.get("taskId").toString() +" to done", "Promote task " + req.get("taskId").toString() +" to done");
-
         }
         
         //Return
