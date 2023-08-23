@@ -123,9 +123,8 @@ System.out.println("result after " + result);
         }catch(Exception e){
             if(transaction != null){
                 transaction.rollback();
-
+                return false;
             }
-            e.printStackTrace();
         }finally{
             if(session != null){
                 session.close();

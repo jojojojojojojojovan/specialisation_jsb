@@ -2,9 +2,10 @@ package com.tmsapp.tms.Repository;
 
 import javax.persistence.NoResultException;
 
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.exception.GenericJDBCException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,6 +64,9 @@ public class JwtRepository {
             // transaction.commit();
         }
         catch(NoResultException e){
+            result = null;
+        }
+        catch(GenericJDBCException e) {
             result = null;
         }
         catch(Exception e){

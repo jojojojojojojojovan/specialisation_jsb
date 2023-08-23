@@ -118,7 +118,7 @@ public class ApplicationService {
             return result;
         }
 
-
+        System.out.println("description: " + req.get("description").toString());
         //Construct application
         Application application = new Application(req.get("acronym").toString(), req.get("description").toString(), Integer.valueOf(req.get("rnumber").toString()), checkStartDate, checkEndDate, create, open, toDo, doing, done);
         Map<String, Object> isCreated = applicationRepository.createApplication(application);
@@ -198,7 +198,7 @@ public class ApplicationService {
             Date tempStartDate = application.getApp_startDate();
             int dateCompare = tempStartDate.compareTo(temp);
             //Start date is after end date
-            if(dateCompare > 0 ){
+            if(dateCompare >= 0 ){
                 result.put("success", false);
                 return result;
 
@@ -208,46 +208,52 @@ public class ApplicationService {
                 application.setApp_endDate(temp);
             }
         }
-        if(req.get("create") != null){
-            Accgroup temp = accgroupRepository.getGroupByGroupName(req.get("create").toString());
+        if(req.get("permitCreate") != null){
+            System.out.println(req.get("permitCreate"));
+            Accgroup temp = accgroupRepository.getGroupByGroupName(req.get("permitCreate").toString());
             if(temp != null){
                 application.setApp_permit_Create(temp.getGroupName());
             }
         }
-        if(req.get("open") != null){
-            Accgroup temp = accgroupRepository.getGroupByGroupName(req.get("open").toString());
+        if(req.get("permitOpen") != null){
+            Accgroup temp = accgroupRepository.getGroupByGroupName(req.get("permitOpen").toString());
             if(temp != null){
                 application.setApp_permit_Open(temp.getGroupName());
             }
         }
-        if(req.get("todo") != null){
-            Accgroup temp = accgroupRepository.getGroupByGroupName(req.get("todo").toString());
+        if(req.get("permitTodo") != null){
+            Accgroup temp = accgroupRepository.getGroupByGroupName(req.get("permitTodo").toString());
             if(temp != null){
                 application.setApp_permit_toDo(temp.getGroupName());
             }
         }
-        if(req.get("doing") != null){
-            Accgroup temp = accgroupRepository.getGroupByGroupName(req.get("doing").toString());
+        if(req.get("permitDoing") != null){
+            Accgroup temp = accgroupRepository.getGroupByGroupName(req.get("permitDoing").toString());
             if(temp != null){
                 application.setApp_permit_Doing(temp.getGroupName());
             }
         }
-        if(req.get("done") != null){
-            Accgroup temp = accgroupRepository.getGroupByGroupName(req.get("done").toString());
+        if(req.get("permitDone") != null){
+            Accgroup temp = accgroupRepository.getGroupByGroupName(req.get("permitDone").toString());
             if(temp != null){
                 application.setApp_permit_Done(temp.getGroupName());
             }
+        }
+        if(req.get("description") != null) {
+            application.setApp_Description(req.get("description").toString());
         }
         // if(req.get("rnumber") != null){
         //     int temp = (int) req.get("rnumber");
         //     application.setApp_Rnumber(temp);
         // }
-
+        System.out.println(application);
         //Update application 
         boolean isUpdated = applicationRepository.updateApplication(application);
         if(isUpdated) result.put("success", true);
-        else result.put("success", false);
-
+        else {
+            result.put("success", false);
+            result.put("message", "application failed to update");
+        }
         return result;
     }
 

@@ -47,7 +47,7 @@ public class HibernateUtil {
 				settings.put(Environment.DIALECT, "org.hibernate.dialect.MySQL55Dialect");
 				settings.setProperty("hibernate.dialect.storage_engine", "innodb");
 
-				settings.put(Environment.SHOW_SQL, "true");
+				settings.put(Environment.SHOW_SQL, "false");
 
 				settings.put(Environment.CURRENT_SESSION_CONTEXT_CLASS, "thread");
 

@@ -85,6 +85,17 @@ public class Application {
     @JsonCreator
     public Application() {};
 
+    
+
+    @Override
+    public String toString() {
+        return "Application [App_Acronym=" + App_Acronym + ", App_Description=" + App_Description + ", App_Rnumber="
+                + App_Rnumber + ", App_startDate=" + App_startDate + ", App_endDate=" + App_endDate
+                + ", App_permit_Create=" + App_permit_Create + ", App_permit_Open=" + App_permit_Open
+                + ", App_permit_toDo=" + App_permit_toDo + ", App_permit_Doing=" + App_permit_Doing
+                + ", App_permit_Done=" + App_permit_Done + ", plans=" + plans + ", tasks=" + tasks + "]";
+    }
+
     public String getApp_Acronym() {
         return App_Acronym;
     }
