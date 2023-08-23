@@ -3,11 +3,13 @@ package com.tmsapp.tms.Repository;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.PersistenceException;
 import javax.transaction.Transactional;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.exception.GenericJDBCException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -89,7 +91,20 @@ public class PlanRepository {
             
 
             transaction.commit();
-        }catch(Exception e){
+        }        catch (PersistenceException e) {
+            if (e.getCause() instanceof GenericJDBCException) {
+                // Handle the specific exception for duplicate key violation
+                // result = false;
+            } else {
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+                e.printStackTrace();
+                // result = false;
+            }
+        }
+        
+        catch(Exception e){
             if(transaction != null){
                 transaction.rollback();
 
