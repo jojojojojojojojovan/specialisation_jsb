@@ -1,13 +1,14 @@
 package com.tmsapp.tms.Entity;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 public class PlanDTO {
     private String plan_MVP_name;
 
-    private Date plan_startDate;
+    private LocalDate plan_startLocalDateTime;
 
-    private Date plan_endDate;
+    private LocalDate plan_endLocalDateTime;
 
     private String colour;
 
@@ -29,20 +30,20 @@ public class PlanDTO {
         this.plan_MVP_name = plan_MVP_name;
     }
 
-    public Date getPlan_startDate() {
-        return plan_startDate;
+    public LocalDate getPlan_startLocalDateTime() {
+        return plan_startLocalDateTime;
     }
 
-    public void setPlan_startDate(Date plan_startDate) {
-        this.plan_startDate = plan_startDate;
+    public void setPlan_startLocalDateTime(LocalDate plan_startLocalDateTime) {
+        this.plan_startLocalDateTime = plan_startLocalDateTime;
     }
 
-    public Date getPlan_endDate() {
-        return plan_endDate;
+    public LocalDate getPlan_endLocalDateTime() {
+        return plan_endLocalDateTime;
     }
 
-    public void setPlan_endDate(Date plan_endDate) {
-        this.plan_endDate = plan_endDate;
+    public void setPlan_endLocalDateTime(LocalDate plan_endLocalDateTime) {
+        this.plan_endLocalDateTime = plan_endLocalDateTime;
     }
 
 
@@ -55,12 +56,12 @@ public class PlanDTO {
     }
 
     public PlanDTO( String plan_MVP_name, 
-                 Date plan_startDate, 
-                 Date plan_endDate,
+                 LocalDate plan_startLocalDateTime, 
+                 LocalDate plan_endLocalDateTime,
                  String colour) {
         this.plan_MVP_name = plan_MVP_name;
-        this.plan_startDate = plan_startDate;
-        this.plan_endDate = plan_endDate;
+        this.plan_startLocalDateTime = plan_startLocalDateTime;
+        this.plan_endLocalDateTime = plan_endLocalDateTime;
         this.colour = colour;
     }
 

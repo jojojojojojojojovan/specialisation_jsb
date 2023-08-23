@@ -117,7 +117,7 @@ public class TaskRepository {
             session = hibernateUtil.getSessionFactory().openSession();
             transaction =session.beginTransaction();
             System.out.println(appAcronym);
-            String hql = "SELECT new Task(t.taskName, t.taskDescription, t.taskNotes, t.taskId, t.taskPlan, t.taskAppAcronym, t.taskState, t.taskCreator, t.taskOwner, t.taskCreateDate)FROM Task t INNER JOIN t.taskAppAcronym a LEFT JOIN t.taskPlan WHERE a.App_Acronym = :appAcronym";
+            String hql = "SELECT new Task(t.taskName, t.taskDescription, t.taskNotes, t.taskId, t.taskPlan, t.taskAppAcronym, t.taskState, t.taskCreator, t.taskOwner, t.taskCreateLocalDateTime)FROM Task t INNER JOIN t.taskAppAcronym a LEFT JOIN t.taskPlan WHERE a.App_Acronym = :appAcronym";
             
             Query<Task> query = session.createQuery(hql, Task.class);
             query.setParameter("appAcronym", appAcronym);
