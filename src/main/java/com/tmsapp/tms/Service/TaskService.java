@@ -532,7 +532,7 @@ public class TaskService {
 
         boolean isUpdated = taskRepository.updateTask(updateTask);
 
-        if(req.get("taskState").equals("Done") && isUpdated){
+        if(req.get("taskState").equals("done") && isUpdated){
             emailService.sendEmail("tmspl0606@gmail.com", "Promote task " + req.get("taskId").toString() +" to done", "Promote task " + req.get("taskId").toString() +" to done");
 
         }
