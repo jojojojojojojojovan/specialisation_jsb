@@ -268,7 +268,7 @@ public class TaskService {
             //task state not in open
             if(!task.getTaskState().toLowerCase().equals("open")){
                 response.put("success", false);
-                response.put("message", "Current task is not in open state");
+                response.put("message", "current task is not in open state");
                 return response;
             }
             application = applicationRepository.getApplication(task.getTaskAppAcronym());
@@ -292,7 +292,7 @@ public class TaskService {
             plan = planRepository.getPlansByPlanName(req.get("taskPlan").toString());
             if(plan == null){
                 response.put("success", false);
-                response.put("message", "No exisiting plan");
+                response.put("message", "no exisiting plan");
                 return response;
             }
             task.setTaskPlan(plan.getPlan_MVP_name());
@@ -356,7 +356,7 @@ public class TaskService {
         
         if(task == null){
             response.put("success", false);
-            response.put("message", "Invalid TaskId");
+            response.put("message", "invalid TaskId");
             return response;
         }
         Application application = applicationRepository.getApplication(task.getTaskAppAcronym());
@@ -375,7 +375,7 @@ public class TaskService {
             newPlan = planRepository.getPlansByPlanName(req.get("taskPlan").toString());
             if(newPlan == null){
                 response.put("success", false);
-                response.put("message", "Invalid plan name");
+                response.put("message", "invalid plan name");
                 return response;
             }
             task.setTaskPlan(newPlan.getPlan_MVP_name());
@@ -394,7 +394,7 @@ public class TaskService {
         System.out.println(task.getTaskState());
         if(!task.getTaskState().toLowerCase().equals("done")){
             response.put("success", false);
-            response.put("message", "Current task is not in done state");
+            response.put("message", "current task is not in done state");
             return response;
         }
         if(task.getTaskState().toLowerCase() != req.get("taskState").toString().toLowerCase()){
@@ -434,13 +434,14 @@ public class TaskService {
         }
 
         response.put("success", false);
+        response.put("message", "task update error");
         return response;
     }
 
     @Transactional
     public Map<String, Object> TMEditTask (Map<String, Object> req){
         Map<String, Object> response = new HashMap<>();
-        System.out.println(" inside tm edit task service ");
+
         //Check for required fields 
         if(req.get("taskId") == null || req.get("un") == null || req.get("gn") == null || req.get("taskState") == null || req.get("acronym")==null){
             response.put("success", false);
@@ -474,7 +475,7 @@ public class TaskService {
             if(!task.getTaskState().toLowerCase().equals("todo") && !task.getTaskState().toLowerCase().equals("doing")){
                 System.out.println("task.getTaskState() " + task.getTaskState());
                 response.put("success", false);
-                response.put("message", "Invalid Task state.Current task is in " + task.getTaskState() +" state");
+                response.put("message", "invalid task state");
                 return response;
             }
             //task
@@ -495,7 +496,7 @@ public class TaskService {
         if(!task.getTaskState().toLowerCase().equals(req.get("taskState").toString().toLowerCase())){
             if (!((task.getTaskState().toLowerCase().equals("todo") && newtaskstate.equals("doing")) || (task.getTaskState().toLowerCase().equals("doing") && (newtaskstate.equals("done") || newtaskstate.equals("todo"))))){
                 response.put("success", false);
-                response.put("message", "Invalid Task state update. " + task.getTaskState() + " state cannot be updated to " + req.get("taskState").toString() + " state");
+                response.put("message", "invalid task state update");
                 return response;
             }
 
@@ -543,6 +544,7 @@ public class TaskService {
         }
 
         response.put("success", false);
+        response.put("message", "task update error");
         return response;
     }
 
@@ -552,7 +554,7 @@ public class TaskService {
 
     public Map<String, Object> Email (Map<String, Object> req){
         Map<String, Object> response = new HashMap<>();
-        System.out.println(" inside email service ");
+
         //Check for required fields 
         if(req.get("taskId") == null || req.get("un") == null || req.get("gn") == null){
             response.put("success", false);
@@ -577,7 +579,7 @@ public class TaskService {
 
         if(task == null){
             response.put("success", false);
-            response.put("message", "Invalid task id");
+            response.put("message", "invalid task id");
             return response;
         } 
         else{
@@ -586,7 +588,7 @@ public class TaskService {
             if(!task.getTaskState().toLowerCase().equals("done")){
                 System.out.println("task.getTaskState() " + task.getTaskState());
                 response.put("success", false);
-                response.put("message", "Invalid Task state.Current task is in " + task.getTaskState() +" state");
+                response.put("message", "invalid task state");
                 return response;
             }
             //task
