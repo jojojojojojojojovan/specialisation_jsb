@@ -19,7 +19,7 @@ public class TaskDTO {
 
     private String taskOwner;
 
-    private LocalDate taskCreateDate;
+    private Date taskCreateDate;
    
     private String taskPlan;
 
@@ -99,12 +99,12 @@ public class TaskDTO {
         this.taskOwner = taskOwner;
     }
 
-    public LocalDate getTaskCreateDate() {
+    public Date getTaskCreateDate() {
         return taskCreateDate;
     }
 
-    public void setTaskCreateDate(LocalDate taskCreateDate) {
-        this.taskCreateDate = taskCreateDate;
+    public void setTaskCreateDate(Date tempNow) {
+        this.taskCreateDate = tempNow;
     }
 
     public String getTaskPlan() {

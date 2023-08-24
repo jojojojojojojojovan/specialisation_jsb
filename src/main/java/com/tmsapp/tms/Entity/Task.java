@@ -42,7 +42,7 @@ public class Task {
     private String taskOwner;
 
     @Column
-    private LocalDate taskCreateDate;
+    private Date taskCreateDate;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JsonIgnore
@@ -66,7 +66,7 @@ public class Task {
                 @JsonProperty("taskState") String taskState,
                 @JsonProperty("taskCreator") String taskCreator,
                 @JsonProperty("taskOwner") String taskOwner,
-                @JsonProperty("taskCreateDate") LocalDate taskCreateDate) {
+                @JsonProperty("taskCreateDate") Date taskCreateDate) {
         this.taskName = taskName;
         this.taskDescription = taskDescription;
         this.taskNotes = taskNotes;
@@ -167,11 +167,11 @@ public class Task {
         this.taskOwner = taskOwner;
     }
 
-    public LocalDate getTaskCreateDate() {
+    public Date getTaskCreateDate() {
         return taskCreateDate;
     }
 
-    public void setTaskCreateDate(LocalDate taskCreateDate) {
+    public void setTaskCreateDate(Date taskCreateDate) {
         this.taskCreateDate = taskCreateDate;
     }
     
