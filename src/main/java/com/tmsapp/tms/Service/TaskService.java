@@ -89,7 +89,6 @@ public class TaskService {
             return response;
         }
         
-        System.out.println("here");
         try {
             Jws<Claims> jwtContents = Jwts.parserBuilder()
                 .setSigningKey(ApplicationConstant.SECURITY_KEY.getBytes(StandardCharsets.UTF_8))
@@ -238,7 +237,6 @@ public class TaskService {
         String id,un,state;
         //Check for required fields 
         // System.out.println(req.get("taskId").toString());
-        System.out.println(req.get("requestBody"));
         // System.out.println(req.get("taskState").toString());
         if(req.get("taskId") == null || req.get("un") == null || req.get("taskState") == null){
             response.put("success", false);
@@ -265,14 +263,14 @@ public class TaskService {
             response.put("message", "Invalid task id");
             return response;
         } else{
-            //task state not in open
+            //task state not in open    
             if(!task.getTaskState().toLowerCase().equals("open")){
                 response.put("success", false);
                 response.put("message", "Current task is not in open state");
                 return response;
             }
             application = applicationRepository.getApplication(task.getTaskAppAcronym());
-            if(application !=null){
+            if(application !=null){ 
                 //check if user is pm 
                 boolean isPM = checkGroup.checkgroup(un,application.getApp_permit_Open());
                 if(!isPM){
@@ -287,40 +285,48 @@ public class TaskService {
             }
         }
 
+        //Get current date
+        LocalDate date = LocalDate.now();
+        //System/User's notes
+        String notes="";
+
         //Check if plan exisit if req.get("taskPlan") != null
         if(req.get("taskPlan") !=null){
             plan = planRepository.getPlansByPlanName(req.get("taskPlan").toString());
             if(plan == null){
                 response.put("success", false);
-                response.put("message", "No exisiting plan");
+                response.put("message", "Invalid plan name");
                 return response;
             }
-            task.setTaskPlan(plan.getPlan_MVP_name());
+            String oldplan = "";
+            if (task.getTaskPlan() != null){
+                oldplan = task.getTaskPlan();
+            }     
+            if (!oldplan.equals(plan.getPlan_MVP_name())){
+                task.setTaskPlan(plan.getPlan_MVP_name());
+                notes += "||system|" + task.getTaskState() + "|" + date.toString() + "| Updated task plan";
+            }
         }else{
             plan = null;
-        }
-
-        //Get current date
-        LocalDate date = LocalDate.now();
-        //System/User's notes
-        String systemNotes="",userNotes = "";
-
-        //task is being promoted
-        if(state.equals("todo")){
-            systemNotes = "||system|" + task.getTaskState() + "|" + date.toString() + "| Updated task state from open to todo";
-            task.setTaskState(state);
+            if (task.getTaskPlan() != null){
+                notes += "||system|" + task.getTaskState() + "|" + date.toString() + "| Updated task plan";
+            }
         }
 
         //there is new notes
         if(req.get("userNotes") != null){
-            systemNotes += "||system|" + task.getTaskState() + "|" + date.toString() + "| Updated task user notes||";
-            userNotes = req.get("un").toString() + "|" + task.getTaskState() + "|" + date.toString()+ "|" + req.get("userNotes");
+            notes += "||" + req.get("un").toString() + "|" + task.getTaskState() + "|" + date.toString()+ "|" + req.get("userNotes");
+            notes += "||system|" + task.getTaskState() + "|" + date.toString() + "| Updated task user notes";
         }
-        if(systemNotes != ""){
-            task.setTaskNotes(task.getTaskNotes().concat(systemNotes));
+       
+        //task is being promoted
+        if(state.equals("todo")){
+            notes += "||system|" + task.getTaskState() + "|" + date.toString() + "| Updated task state";
+            task.setTaskState(state);
         }
-        if(userNotes != ""){
-            task.setTaskNotes(task.getTaskNotes().concat(userNotes));
+
+        if(!notes.equals("")){
+            task.setTaskNotes(task.getTaskNotes().concat(notes));
         }
 
         //Update task creator
@@ -369,6 +375,12 @@ public class TaskService {
         }
 
         //Check if plan exisit if req.get("taskPlan") != null
+        //Get current date
+        LocalDate tempDateNow = LocalDate.now();
+
+        //System/User's notes
+        String notes="";
+
         if(req.get("taskPlan") !=null){
             newPlan = planRepository.getPlansByPlanName(req.get("taskPlan").toString());
             if(newPlan == null){
@@ -376,26 +388,37 @@ public class TaskService {
                 response.put("message", "Invalid plan name");
                 return response;
             }
-            task.setTaskPlan(newPlan.getPlan_MVP_name());
+            String oldplan = "";
+            if (task.getTaskPlan() != null){
+                oldplan = task.getTaskPlan();
+            }   
+            if (!oldplan.equals(newPlan.getPlan_MVP_name())){
+                task.setTaskPlan(newPlan.getPlan_MVP_name());
+                notes += "||system|" + task.getTaskState() + "|" + tempDateNow.toString() + "| Updated task plan";
+            }
         }else{
             newPlan = null;
+            if (task.getTaskPlan() != null){
+                notes += "||system|" + task.getTaskState() + "|" + tempDateNow.toString() + "| Updated task plan";
+            }
         }
 
-        //Get current date
-        LocalDate tempDateNow = LocalDate.now();
-
-        //System/User's notes
-        String systemNotes = null;
-        String userNotes = null;
+        
         //task state 
-        //Check current task state as open
+        //Check current task state as done
         System.out.println(task.getTaskState());
         if(!task.getTaskState().toLowerCase().equals("done")){
             response.put("success", false);
             response.put("message", "Current task is not in done state");
             return response;
         }
-        if(task.getTaskState().toLowerCase() != req.get("taskState").toString().toLowerCase()){
+        
+        if(req.get("userNotes") != null){
+            notes += "||system|" + task.getTaskState() + "|" + tempDateNow.toString() + "| Updated task user notes";
+            notes += "||" + req.get("un").toString() + "|" + task.getTaskState().toLowerCase() + "|" + tempDateNow.toString() + "|" + req.get("userNotes");
+        }
+
+        if(!(task.getTaskState().toLowerCase().equals(req.get("taskState").toString().toLowerCase()))){
             
             if(req.get("taskState").toString().equals("doing") || req.get("taskState").toString().equals("done") || req.get("taskState").toString().equals("closed")){
                 //do nothing
@@ -404,18 +427,12 @@ public class TaskService {
                 response.put("message", "input task state incorrect");
                 return response;
             }
-            systemNotes = "||system|" + task.getTaskState() + "|" + tempDateNow.toString() + "| Updated task state";
+            notes += "||system|" + task.getTaskState() + "|" + tempDateNow.toString() + "| Updated task state";
             task.setTaskState(req.get("taskState").toString());
         }
-        if(req.get("userNotes") != null){
-            systemNotes = "||system|" + task.getTaskState() + "|" + tempDateNow.toString() + "| Updated task user notes";
-            userNotes = "||" + req.get("un").toString() + "|" + task.getTaskState().toLowerCase() + "|" + tempDateNow.toString() + "|" + req.get("userNotes");
-        }
-        if(systemNotes != null){
-            task.setTaskNotes(task.getTaskNotes().concat(systemNotes));
-        }
-        if(userNotes != null){
-            task.setTaskNotes(task.getTaskNotes().concat(userNotes));
+        
+        if(notes != ""){
+            task.setTaskNotes(task.getTaskNotes().concat(notes));
         }
 
         //Update task creator
@@ -483,13 +500,16 @@ public class TaskService {
         LocalDate tempDateNow = LocalDate.now();
 
         //System/User's notes
-        String systemNotes = null;
-        String userNotes = null;
+        String notes = "";
         //task state 
         //Check current task state as open
         System.out.println("task.getTaskState()" +task.getTaskState());
         System.out.println("req.get(\"taskState\") "  + req.get("taskState"));
 
+        if(req.get("userNotes") != null){
+            notes += "||system|" + task.getTaskState() + "|" + tempDateNow.toString() + "| Updated task user notes||";
+            notes += req.get("un").toString() + "|" + task.getTaskState() + "|" + tempDateNow.toString()+ "|" + req.get("userNotes").toString();
+        }
         if(!task.getTaskState().toLowerCase().equals(req.get("taskState").toString().toLowerCase())){
             if (!((task.getTaskState().toLowerCase().equals("todo") && newtaskstate.equals("doing")) || (task.getTaskState().toLowerCase().equals("doing") && (newtaskstate.equals("done") || newtaskstate.equals("todo"))))){
                 response.put("success", false);
@@ -497,20 +517,12 @@ public class TaskService {
                 return response;
             }
 
-            systemNotes = "||system|" + task.getTaskState() + "|" + tempDateNow.toString() + "| Updated task state";
+            notes += "||system|" + task.getTaskState() + "|" + tempDateNow.toString() + "| Updated task state";
             task.setTaskState(req.get("taskState").toString());
         }
 
-        if(req.get("userNotes") != null){
-            systemNotes = "||system|" + task.getTaskState() + "|" + tempDateNow.toString() + "| Updated task user notes||";
-            userNotes = req.get("un").toString() + "|" + task.getTaskState() + "|" + tempDateNow.toString()+ "|" + req.get("userNotes").toString();
-        }
-
-        if(systemNotes != null){
-            task.setTaskNotes(task.getTaskNotes().concat(systemNotes));
-        }
-        if(userNotes != null){
-            task.setTaskNotes(task.getTaskNotes().concat(userNotes));
+        if(notes != ""){
+            task.setTaskNotes(task.getTaskNotes().concat(notes));
         }
 
         //Update task creator
