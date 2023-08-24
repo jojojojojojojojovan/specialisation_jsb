@@ -26,30 +26,30 @@ public class TmsApplication {
 		SpringApplication.run(TmsApplication.class, args);
 	}
 
-	// @Autowired
-	// private AccountRepository accountRepository;
+	@Autowired
+	private AccountRepository accountRepository;
 
-	// @Autowired
-	// private AccountService accountService;
+	@Autowired
+	private AccountService accountService;
 
-	// @EventListener(ApplicationReadyEvent.class)
-	// public void createInitialAccount() {
-	// 	Account adminUser = accountRepository.getAccountByUsername("pl");
-	// 	if(adminUser != null) {
-	// 		return;
-	// 	}
-	// 	Map<String, Object> account = new HashMap<>();
-	// 	Map<String, Object> groups = new HashMap<>();
-	// 	groups.put("groupName", "admin,project leader,team member,user,devops,project manager");
-	// 	account.put("username", "pl");
-	// 	account.put("password", "P@ssw0rd12");
-	// 	account.put("status", 1);
-	// 	List<Object> groupsList = new ArrayList<Object>();
-	// 	groupsList.add(groups);
-	// 	account.put("groups", groupsList);
-	// 	Map<String, Object> input = new HashMap<>();
-	// 	input.put("account", account);
-	// 	accountService.createAccount(input);
-	// }
+	@EventListener(ApplicationReadyEvent.class)
+	public void createInitialAccount() {
+		Account adminUser = accountRepository.getAccountByUsername("admin");
+		if(adminUser != null) {
+			return;
+		}
+		Map<String, Object> account = new HashMap<>();
+		Map<String, Object> groups = new HashMap<>();
+		groups.put("groupName", "admin");
+		account.put("username", "admin");
+		account.put("password", "p@ssword1");
+		account.put("status", 1);
+		List<Object> groupsList = new ArrayList<Object>();
+		groupsList.add(groups);
+		account.put("groups", groupsList);
+		Map<String, Object> input = new HashMap<>();
+		input.put("account", account);
+		accountService.createAccount(input);
+	}
 
 }
