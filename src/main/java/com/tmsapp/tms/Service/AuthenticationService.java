@@ -48,10 +48,19 @@ public class AuthenticationService {
 
                 Account user =  accountRepository.getAccountByUsername(username);
 
+                
+
                 if(user == null) {
                     result.put("success", false);
                     result.put("message", "invalid token");
                 }
+
+                if(user.getStatus() == 0 ) {
+                    result.put("success", false);
+                    result.put("message", "inactive user");
+                    return result;
+                }
+                
                 List<Accgroup> userGroups  = accountRepository.getGroupsByUsername(username);
 
                 //System.out.println(user.getUsername());

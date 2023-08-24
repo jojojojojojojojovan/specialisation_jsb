@@ -14,8 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.tmsapp.tms.Entity.Accgroup;
+import com.tmsapp.tms.Entity.Account;
 import com.tmsapp.tms.Entity.Application;
 import com.tmsapp.tms.Repository.AccgroupRepository;
+import com.tmsapp.tms.Repository.AccountRepository;
 import com.tmsapp.tms.Repository.ApplicationRepository;
 
 @Service
@@ -28,6 +30,9 @@ public class ApplicationService {
     AccgroupRepository accgroupRepository;
 
     @Autowired
+    AccountRepository accountRepository;
+
+    @Autowired
     Checkgroup checkgroup;
 
     public Map<String, Object> createApplication(Map<String, Object> req){
@@ -38,6 +43,14 @@ public class ApplicationService {
             result.put("message", "no un gn");
             return result;
         }
+        Account account = accountRepository.getAccountByUsername(req.get("un").toString());
+        if(account.getStatus() == 0) {
+            result.put("success", false);
+            result.put("message", "user inactive");
+            return result;
+        }
+
+
         boolean isPL =  checkgroup.checkgroup(req.get("un").toString(), req.get("gn").toString());
         if(!isPL){
             result.put("success", false);
@@ -175,7 +188,6 @@ public class ApplicationService {
         }
         try {
             Application application = applicationRepository.getApplication(req.get("appAcronym").toString());
-            System.out.println(application.getApp_startDate());
 
             if(application == null) {
                 result.put("success", false);
@@ -202,6 +214,12 @@ public class ApplicationService {
             result.put("success", false);
             result.put("message", "no un gn");
             return result;
+        }
+        Account account = accountRepository.getAccountByUsername((req.get("un").toString()));
+        if(account.getStatus() == 0) {
+            result.put("message", "user inactive");
+            result.put("success", false);
+            return result; 
         }
         boolean isPL =  checkgroup.checkgroup(req.get("un").toString(), req.get("gn").toString());
         if(!isPL){ 
@@ -231,8 +249,8 @@ public class ApplicationService {
             //Start date is after end date
             if(dateCompare > 0 ){
                 result.put("success", false);
+                result.put("message", "end date cannot be earlier than start date");
                 return result;
-
             }
             if(temp != null){
                 System.out.println("temp " + temp);
