@@ -310,24 +310,23 @@ public class TaskService {
             }     
             if (!oldplan.equals(plan.getPlan_MVP_name())){
                 task.setTaskPlan(plan.getPlan_MVP_name());
-                notes += "||system|" + task.getTaskState() + "|" + date.toString() + "| Updated task plan";
+                notes += "||system|" + task.getTaskState() + "|" + date.toString() + "| Task plan changed to " + plan.getPlan_MVP_name();
             }
         }else{
             plan = null;
             if (task.getTaskPlan() != null){
-                notes += "||system|" + task.getTaskState() + "|" + date.toString() + "| Updated task plan";
+                notes += "||system|" + task.getTaskState() + "|" + date.toString() + "| Task plan removed";
             }
         }
 
         //there is new notes
         if(req.get("userNotes") != null){
             notes += "||" + req.get("un").toString() + "|" + task.getTaskState() + "|" + date.toString()+ "|" + req.get("userNotes");
-            notes += "||system|" + task.getTaskState() + "|" + date.toString() + "| Updated task user notes";
         }
        
         //task is being promoted
         if(state.equals("todo")){
-            notes += "||system|" + task.getTaskState() + "|" + date.toString() + "| Updated task state";
+            notes += "||system|" + task.getTaskState() + ">" + state + "|" + date.toString() + "| Updated task state";
             task.setTaskState(state);
         }
 
@@ -400,12 +399,12 @@ public class TaskService {
             }   
             if (!oldplan.equals(newPlan.getPlan_MVP_name())){
                 task.setTaskPlan(newPlan.getPlan_MVP_name());
-                notes += "||system|" + task.getTaskState() + "|" + tempDateNow.toString() + "| Updated task plan";
+                notes += "||system|" + task.getTaskState() + "|" + tempDateNow.toString() + "| Task plan changed to " + newPlan.getPlan_MVP_name();
             }
         }else{
             newPlan = null;
             if (task.getTaskPlan() != null){
-                notes += "||system|" + task.getTaskState() + "|" + tempDateNow.toString() + "| Updated task plan";
+                notes += "||system|" + task.getTaskState() + "|" + tempDateNow.toString() + "| Task plan removed";
             }
         }
 
@@ -420,7 +419,6 @@ public class TaskService {
         }
         
         if(req.get("userNotes") != null){
-            notes += "||system|" + task.getTaskState() + "|" + tempDateNow.toString() + "| Updated task user notes";
             notes += "||" + req.get("un").toString() + "|" + task.getTaskState().toLowerCase() + "|" + tempDateNow.toString() + "|" + req.get("userNotes");
         }
 
@@ -433,7 +431,7 @@ public class TaskService {
                 response.put("message", "input task state incorrect");
                 return response;
             }
-            notes += "||system|" + task.getTaskState() + "|" + tempDateNow.toString() + "| Updated task state";
+            notes += "||system|" + task.getTaskState() +">"+ req.get("taskState").toString()+ "|" + tempDateNow.toString() + "| Updated task state";
             task.setTaskState(req.get("taskState").toString());
         }
         
@@ -514,8 +512,7 @@ public class TaskService {
         System.out.println("req.get(\"taskState\") "  + req.get("taskState"));
 
         if(req.get("userNotes") != null){
-            notes += "||system|" + task.getTaskState() + "|" + tempDateNow.toString() + "| Updated task user notes||";
-            notes += req.get("un").toString() + "|" + task.getTaskState() + "|" + tempDateNow.toString()+ "|" + req.get("userNotes").toString();
+           notes += "||"+req.get("un").toString() + "|" + task.getTaskState() + "|" + tempDateNow.toString()+ "|" + req.get("userNotes").toString();
         }
         if(!task.getTaskState().toLowerCase().equals(req.get("taskState").toString().toLowerCase())){
             if (!((task.getTaskState().toLowerCase().equals("todo") && newtaskstate.equals("doing")) || (task.getTaskState().toLowerCase().equals("doing") && (newtaskstate.equals("done") || newtaskstate.equals("todo"))))){
@@ -524,7 +521,7 @@ public class TaskService {
                 return response;
             }
 
-            notes += "||system|" + task.getTaskState() + "|" + tempDateNow.toString() + "| Updated task state";
+            notes += "||system|" + task.getTaskState()+">"+ req.get("taskState").toString()+ "|" + tempDateNow.toString() + "| Updated task state";
             task.setTaskState(req.get("taskState").toString());
         }
 
