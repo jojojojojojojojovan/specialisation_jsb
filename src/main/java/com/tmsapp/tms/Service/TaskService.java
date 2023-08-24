@@ -523,16 +523,16 @@ public class TaskService {
 
         boolean isUpdated = taskRepository.updateTask(updateTask);
 
-        String username = req.get("un").toString();
-        System.out.println("username " + username);
-        String email = accountRepository.getEmail(username);
-        System.out.println("email " + email);
+        // String username = req.get("un").toString();
+        // System.out.println("username " + username);
+        // String email = accountRepository.getEmail(username);
+        // System.out.println("email " + email);
 
-        System.out.println("true " + (req.get("taskState").equals("done") && isUpdated));
+        // System.out.println("true " + (req.get("taskState").equals("done") && isUpdated));
 
-        if(req.get("taskState").equals("done") && isUpdated){
-            emailService.sendEmail(email, "Promote task " + req.get("taskId").toString() +" to done", "Promote task " + req.get("taskId").toString() +" to done");
-        }
+        // if(req.get("taskState").equals("done") && isUpdated){
+        //     emailService.sendEmail(email, "Promote task " + req.get("taskId").toString() +" to done", "Promote task " + req.get("taskId").toString() +" to done");
+        // }
         
         //Return
         if(isUpdated){
@@ -544,4 +544,66 @@ public class TaskService {
         return response;
     }
 
+
+
+    //email 
+
+    public Map<String, Object> Email (Map<String, Object> req){
+        Map<String, Object> response = new HashMap<>();
+        System.out.println(" inside email service ");
+        //Check for required fields 
+        if(req.get("taskId") == null || req.get("un") == null || req.get("gn") == null){
+            response.put("success", false);
+            response.put("message", "mandatory fields missing");
+            return response;
+        }
+
+        //check if user is pm 
+        boolean isTM = checkGroup.checkgroup(req.get("un").toString(), req.get("gn").toString());
+        if(!isTM){
+            response.put("success", false);
+            response.put("message", "unauthorized (NOT TM)");
+            return response;  
+        }
+
+        String id = req.get("taskId").toString();
+
+        Application application;
+        // Plan newPlan;
+        TaskDTO task = taskRepository.getTaskById(id);
+
+
+        if(task == null){
+            response.put("success", false);
+            response.put("message", "Invalid task id");
+            return response;
+        } 
+        else{
+            //taskid found  
+            //task state not in todo or doing
+            if(!task.getTaskState().toLowerCase().equals("done")){
+                System.out.println("task.getTaskState() " + task.getTaskState());
+                response.put("success", false);
+                response.put("message", "Invalid Task state.Current task is in " + task.getTaskState() +" state");
+                return response;
+            }
+            //task
+            application = applicationRepository.getApplication(task.getTaskAppAcronym());
+        }
+
+        String username = req.get("un").toString();
+        System.out.println("username " + username);
+        String email = accountRepository.getEmail(username);
+        System.out.println("email " + email);
+
+        if(task.getTaskState().toLowerCase().equals("done")){
+            emailService.sendEmail(email, "Promote task " + req.get("taskId").toString() +" to done", "Promote task " + req.get("taskId").toString() +" to done");
+
+            response.put("success", true);
+            return response;
+        }
+
+        response.put("success", false);
+        return response;
+    }
 }
