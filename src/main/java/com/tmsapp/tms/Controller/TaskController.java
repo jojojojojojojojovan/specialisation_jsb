@@ -132,5 +132,14 @@ public class TaskController {
         System.out.println("response " + response);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+    @PostMapping(path = "/email")
+    public ResponseEntity<Map<String, Object>> Email(@RequestBody Map<String, Object> req) {
+        System.out.println(" inside email");
+        Map<String, Object> response = new HashMap<>();
+        response.putAll(taskService.Email(req));
+        System.out.println("response " + response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
     
 }
