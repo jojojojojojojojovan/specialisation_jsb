@@ -106,7 +106,7 @@ public class ApplicationService {
             }
         }
         if(req.get("toDo") != null){
-            Accgroup tempgroup = accgroupRepository.getGroupByGroupName(req.get("todo").toString());
+            Accgroup tempgroup = accgroupRepository.getGroupByGroupName(req.get("toDo").toString());
             if(tempgroup != null){
                 toDo = tempgroup.getGroupName();
             }
