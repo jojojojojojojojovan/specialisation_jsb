@@ -74,7 +74,6 @@ public class JwtRepository {
             //     transaction.rollback();
 
             // }
-            e.printStackTrace();
         }finally{
             if(session != null){
                 session.close();
