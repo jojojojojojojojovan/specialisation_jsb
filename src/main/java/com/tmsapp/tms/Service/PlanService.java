@@ -30,8 +30,23 @@ public class PlanService {
 
     public Map<String, Object> createPlan(Map<String, Object> req){
         Map<String, Object> result = new HashMap<>();
+        //Check if user is in Project manager Group
+        if(req.get("un") == null || req.get("gn") == null){
+            result.put("success", false);
+            result.put("message", "no un gn");
+            return result;
+        }
+        boolean isPM =  checkgroup.checkgroup(req.get("un").toString(), req.get("gn").toString());
+        if(!isPM){
+            result.put("success", false);
+            result.put("message", "not pm");
+            return result; 
+        }
+
+        //Check for mandatory fields
         if(req.get("startDate") == null || req.get("endDate") == null || req.get("planName") == null || req.get("colour") == null || req.get("appAcronym") == null){
             result.put("success", false);
+            result.put("message", "missing madatory fields");
             return result;
         }
 
@@ -39,27 +54,18 @@ public class PlanService {
         Application application = applicationRepository.getApplication(req.get("appAcronym").toString());
         if(application == null){
             result.put("success", false);
+            result.put("message", "app not found");
             return result;
-        }
-        //Check if user has permit open 
-        if(req.get("un") == null){
-            result.put("success", false);
-            return result;
-        }
-        boolean isPM =  checkgroup.checkgroup(req.get("un").toString(), application.getApp_permit_Open());
-        if(!isPM){
-            result.put("success", false);
-            return result; 
         }
 
         //Create plan 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Plan plan;
         try {
             plan = new Plan(req.get("planName").toString(), LocalDate.parse(req.get("startDate").toString()), LocalDate.parse(req.get("endDate").toString()), req.get("colour").toString());
             plan.setApplication(application);
         } catch (Exception e) {    
             result.put("success", false);
+            result.put("message","invalid date format");
             return result;
         }
 
@@ -99,8 +105,10 @@ public class PlanService {
 
         boolean isCreated = planRepository.createPlan(plan);
         if(isCreated)result.put("success", true);
-        else result.put("success", false);
-
+        else {
+            result.put("message", "plan exists");
+            result.put("success", false);
+        }
         return result;
     }
 
