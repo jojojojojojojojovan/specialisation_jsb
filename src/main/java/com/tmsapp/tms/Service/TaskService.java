@@ -59,13 +59,15 @@ public class TaskService {
     EmailService emailService;
 
     public Map<String, Object> createTask(TaskDTO task, String jwtToken) {
-
-        // TaskDTO task = objectMapper.readValue(objectMapper.writeValueAsString(req.get("task")), TaskDTO.class);
-
-        // String jwtToken = req.get("jwtToken");
-
         Map<String, Object> response = new HashMap<>();
-
+        
+        //Input validation
+        if(task.getTaskName() == null || task.getTaskAppAcronym() == null || task.getTaskCreator() == null || task.getTaskOwner() == null){
+            //throw new Error("Missing mandatory field");
+            response.put("success", false);
+            response.put("message", "Missing mandatory field");
+            return response;
+        }
         Map<String, Object> appAcronymObj = new HashMap<>();
         appAcronymObj.put("appAcronym", task.getTaskAppAcronym());
 
@@ -75,7 +77,7 @@ public class TaskService {
 
         if((boolean) applicationObj.get("success") == false) {
             response.put("success", false);
-            response.put("message", "Failed to get application");
+            response.put("message", "Invalid app acronym");
             return response;
         }
         try {
@@ -87,7 +89,7 @@ public class TaskService {
             return response;
         }
         
-
+        System.out.println("here");
         try {
             Jws<Claims> jwtContents = Jwts.parserBuilder()
                 .setSigningKey(ApplicationConstant.SECURITY_KEY.getBytes(StandardCharsets.UTF_8))
@@ -130,14 +132,11 @@ public class TaskService {
             plan = null;
         }
 
-        //Input validation
-        if(task.getTaskName() == null || task.getTaskAppAcronym() == null || task.getTaskCreator() == null || task.getTaskOwner() == null){
-            throw new Error("Missing mandatory field");
-        }
+        
 
         // System generate task note
         LocalDate tempNow = LocalDate.now();
-        String systemNotes = "||system|open|" + tempNow.toString() + "|Task created";
+        String systemNotes = "system|open|" + tempNow.toString() + "|Task created";
         taskNotes = systemNotes;
         System.out.println(task.getTaskNotes());
         if (task.getTaskNotes() != null && !task.getTaskNotes().equals("")) {
@@ -310,13 +309,13 @@ public class TaskService {
         task.setTaskState(state);
         //task is being promoted
         if(state.equals("todo")){
-            systemNotes = "||system|" + un + "|" + date.toString() + "| Updated task state from open to todo";
+            systemNotes = "||system|" + task.getTaskState() + "|" + date.toString() + "| Updated task state from open to todo";
             task.setTaskState(state);
         }
 
         //there is new notes
         if(req.get("userNotes") != null){
-            systemNotes += "||system|" + req.get("un").toString().toLowerCase() + "|" + date.toString() + "| Updated task user notes||";
+            systemNotes += "||system|" + task.getTaskState() + "|" + date.toString() + "| Updated task user notes||";
             userNotes = req.get("un").toString() + "|" + task.getTaskState() + "|" + date.toString()+ "|" + req.get("userNotes");
         }
         if(systemNotes != ""){
@@ -407,12 +406,12 @@ public class TaskService {
                 response.put("message", "input task state incorrect");
                 return response;
             }
-            systemNotes = "||system|" + req.get("un").toString().toLowerCase() + "|" + tempDateNow.toString() + "| Updated task state";
+            systemNotes = "||system|" + task.getTaskState() + "|" + tempDateNow.toString() + "| Updated task state";
             task.setTaskState(req.get("taskState").toString());
         }
         if(req.get("userNotes") != null){
-            systemNotes = "||system|" + req.get("un").toString().toLowerCase() + "|" + tempDateNow.toString() + "| Updated task user notes";
-            userNotes = "||" + req.get("un").toString() + "|" + task.getTaskState() + "|" + tempDateNow.toString() + "|" + req.get("userNotes");
+            systemNotes = "||system|" + task.getTaskState() + "|" + tempDateNow.toString() + "| Updated task user notes";
+            userNotes = "||" + req.get("un").toString() + "|" + task.getTaskState().toLowerCase() + "|" + tempDateNow.toString() + "|" + req.get("userNotes");
         }
         if(systemNotes != null){
             task.setTaskNotes(task.getTaskNotes().concat(systemNotes));
@@ -500,12 +499,12 @@ public class TaskService {
                 return response;
             }
 
-            systemNotes = "||system|" + req.get("un").toString().toLowerCase() + "|" + tempDateNow.toString() + "| Updated task state";
+            systemNotes = "||system|" + task.getTaskState() + "|" + tempDateNow.toString() + "| Updated task state";
             task.setTaskState(req.get("taskState").toString());
         }
 
         if(req.get("userNotes") != null){
-            systemNotes = "||system|" + req.get("un").toString().toLowerCase() + "|" + tempDateNow.toString() + "| Updated task user notes||";
+            systemNotes = "||system|" + task.getTaskState() + "|" + tempDateNow.toString() + "| Updated task user notes||";
             userNotes = req.get("un").toString() + "|" + task.getTaskState() + "|" + tempDateNow.toString()+ "|" + req.get("userNotes").toString();
         }
 
