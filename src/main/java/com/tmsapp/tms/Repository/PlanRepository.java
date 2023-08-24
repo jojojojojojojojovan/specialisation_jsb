@@ -1,7 +1,9 @@
 package com.tmsapp.tms.Repository;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.PersistenceException;
 import javax.transaction.Transactional;
@@ -9,6 +11,7 @@ import javax.transaction.Transactional;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.exception.GenericJDBCException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -24,20 +27,23 @@ public class PlanRepository {
     private HibernateUtil hibernateUtil;
     static Session session;
     
-    public boolean createPlan(Plan plan){
+    public Map<String, Object> createPlan(Plan plan){
         Transaction transaction = null;
-        Boolean result = false;
+        Map<String, Object> result = new HashMap<>();
         try{
             session = hibernateUtil.getSessionFactory().openSession();
             transaction =session.beginTransaction();
             session.save(plan);
             
             transaction.commit();
-            result = true;
-        }catch(Exception e){
+            result.put("success", true);
+        }catch(PersistenceException e) {
+            result.put("success", false);
+            result.put("message", "Plan name already exists");
+        }
+        catch(Exception e){
             if(transaction != null){
                 transaction.rollback();
-
             }
             e.printStackTrace();
         }finally{
@@ -45,7 +51,6 @@ public class PlanRepository {
                 session.close();
             }
         }
-
         return result;
     }
 

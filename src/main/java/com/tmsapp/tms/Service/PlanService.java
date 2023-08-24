@@ -103,12 +103,7 @@ public class PlanService {
             return result;
         }
 
-        boolean isCreated = planRepository.createPlan(plan);
-        if(isCreated)result.put("success", true);
-        else {
-            result.put("message", "plan exists");
-            result.put("success", false);
-        }
+        result = planRepository.createPlan(plan);
         return result;
     }
 
