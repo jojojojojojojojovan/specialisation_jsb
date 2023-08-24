@@ -103,6 +103,12 @@ public class TaskService {
 
                 boolean authorized = checkGroup.checkgroup(username, application.getApp_permit_Create());
                 System.out.println(authorized);
+                Account account = accountRepository.getAccountByUsername(username);
+                if(account.getStatus() == 0) {
+                    response.put("success", false);
+                    response.put("message", "user inactive");
+                    return response;
+                }
                 if(!authorized) {
                     response.put("success", false);
                     response.put("message", "User does not have permission");
