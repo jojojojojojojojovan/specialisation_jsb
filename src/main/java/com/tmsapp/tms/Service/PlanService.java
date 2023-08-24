@@ -12,8 +12,10 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.tmsapp.tms.Entity.Account;
 import com.tmsapp.tms.Entity.Application;
 import com.tmsapp.tms.Entity.Plan;
+import com.tmsapp.tms.Repository.AccountRepository;
 import com.tmsapp.tms.Repository.ApplicationRepository;
 import com.tmsapp.tms.Repository.PlanRepository;
 
@@ -24,6 +26,9 @@ public class PlanService {
     
     @Autowired
     ApplicationRepository applicationRepository;
+
+    @Autowired
+    AccountRepository accountRepository;
 
     @Autowired
     Checkgroup checkgroup;
@@ -41,6 +46,13 @@ public class PlanService {
             result.put("success", false);
             result.put("message", "not pm");
             return result; 
+        }
+
+        Account account = accountRepository.getAccountByUsername(req.get("un").toString());
+        if(account.getStatus() == 0) {
+            result.put("success", false);
+            result.put("message", "user inactive");
+            return result;
         }
 
         //Check for mandatory fields
@@ -103,12 +115,7 @@ public class PlanService {
             return result;
         }
 
-        boolean isCreated = planRepository.createPlan(plan);
-        if(isCreated)result.put("success", true);
-        else {
-            result.put("message", "plan exists");
-            result.put("success", false);
-        }
+        result = planRepository.createPlan(plan);
         return result;
     }
 
