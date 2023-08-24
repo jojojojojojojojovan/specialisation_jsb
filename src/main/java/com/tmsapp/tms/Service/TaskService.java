@@ -306,6 +306,8 @@ public class TaskService {
         //System/User's notes
         String systemNotes="",userNotes = "";
 
+        systemNotes = "||system|" + un + "|" + date.toString() + "| Updated task state in open";
+        task.setTaskState(state);
         //task is being promoted
         if(state.equals("todo")){
             systemNotes = "||system|" + un + "|" + date.toString() + "| Updated task state from open to todo";
