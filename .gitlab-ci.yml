@@ -2,6 +2,7 @@ stages:
   - transfer_build
   - build
   - transfer_bin
+  - ssh
 
 variables:
   BUILD_SVR_PATH: "C:\\Users\\commonuser\\Documents\\mss-academy-projects\\specialization\\build_svr"
@@ -40,7 +41,7 @@ build_jar_file:
     - Write-Host "$BUILD_SVR_PATH\\$env:CI_COMMIT_REF_NAME\\build\\build.ps1"
     - cd "$BUILD_SVR_PATH\\$env:CI_COMMIT_REF_NAME"
     - "& $BUILD_SVR_PATH\\$env:CI_COMMIT_REF_NAME\\build\\build.ps1"
-
+    - tar -cf "$env:CI_COMMIT_REF_NAME.tar" "$BUILD_SVR_PATH\\$env:CI_COMMIT_REF_NAME\\build" "$BUILD_SVR_PATH\\$env:CI_COMMIT_REF_NAME\\bin" "$BUILD_SVR_PATH\\$env:CI_COMMIT_REF_NAME\\deploy" "$BUILD_SVR_PATH\\$env:CI_COMMIT_REF_NAME\\config" "$BUILD_SVR_PATH\\$env:CI_COMMIT_REF_NAME\\test"
   artifacts:
     paths:
       - $ARTIFACT_PATH
@@ -48,7 +49,9 @@ build_jar_file:
 copy_to_bin_repo:
   stage: transfer_bin
   script:
-    - Copy-Item -Path "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME\bin" -Destination "$BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME" -Recurse;
-    - Copy-Item -Path "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME\deploy" -Destination "$BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME" -Recurse;
-    - Copy-Item -Path "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME\config" -Destination "$BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME" -Recurse;
-    # - Copy-Item -Path "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME\test" -Destination "$BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME" -Recurse;
+    - Copy-Item -Path "$env:CI_COMMIT_REF_NAME.tar" -Destination "$BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME\$env:CI_COMMIT_REF_NAME.tar" -Recurse;
+
+# prepare_ssh:
+#   stage: ssh
+#   script:
+#     - 
