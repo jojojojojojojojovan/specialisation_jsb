@@ -7,8 +7,8 @@ copy_to_local_folder:
     - Write-Host "Executing copy"
     - $match = $env:CI_COMMIT_REF_NAME -match "^r_jsb_\d+_\d+$"
     - if ($match) {
-        New-Item -Path "C:\Users\commonuser\Documents\mss-academy-projects\specialization\build_svr" -ItemType Directory -Force
-        Copy-Item -Path "$env:CI_PROJECT_DIR\*" -Destination "C:\Users\commonuser\Documents\mss-academy-projects\specialization\build_svr" -Recurse
+        New-Item -Path "C:\Users\commonuser\Documents\mss-academy-projects\specialization\build_svr" -ItemType Directory -Force;
+        Copy-Item -Path "$env:CI_PROJECT_DIR\*" -Destination "C:\Users\commonuser\Documents\mss-academy-projects\specialization\build_svr" -Recurse;
       } else {
         Write-Host "Branch name does not match the pattern. Skipping..."
       }
