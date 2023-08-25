@@ -20,7 +20,7 @@ copy_to_local_folder:
 build_jar_file:
   stage: build
   script:
-    - ./build.sh
+    - ./build/build.sh
   artifacts:
     paths:
       - ./target/$env:CI_COMMIT_REF_NAME.jar
