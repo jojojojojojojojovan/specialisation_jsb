@@ -50,7 +50,7 @@ copy_to_bin_repo:
   script:
     - if(Test-Path "$BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME\$env:CI_COMMIT_REF_NAME.tar") {
         Remove-Item -Path "$BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME\$env:CI_COMMIT_REF_NAME.tar";
-        Copy-Item -Path "$env:CI_COMMIT_REF_NAME.tar" -Destination "$BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME\$env:CI_COMMIT_REF_NAME.tar" -Recurse;
+        Copy-Item -Path "$BUILD_SVR_PATH\\$env:CI_COMMIT_REF_NAME\\$env:CI_COMMIT_REF_NAME.tar" -Destination "$BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME\$env:CI_COMMIT_REF_NAME.tar" -Recurse;
       }
 
 # prepare_ssh:
