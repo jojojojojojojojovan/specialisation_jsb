@@ -3,14 +3,20 @@ stages:
   - build
   - transfer_bin
 
+variables:
+  BUILD_SVR_PATH: "C:\\Users\commonuser\\Documents\\mss-academy-projects\\specialization\\build_svr"
+
 copy_to_local_folder:
   stage: transfer_build
   script:
     - Write-Host "Executing copy"
     - $match = $env:CI_COMMIT_REF_NAME -match "^r_jsb_\d+_\d+$"
     - if ($match) {
-        New-Item -Path "C:\Users\commonuser\Documents\mss-academy-projects\specialization\build_svr\$env:CI_COMMIT_REF_NAME" -ItemType Directory -Force;
-        Copy-Item -Path "$env:CI_PROJECT_DIR\*" -Destination "C:\Users\commonuser\Documents\mss-academy-projects\specialization\build_svr\$env:CI_COMMIT_REF_NAME" -Recurse;
+        if (Test-Path "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME") {
+          Remove-Item -Path "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME" -Recurse -Force;
+        }
+        New-Item -Path "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME" -ItemType Directory -Force;
+        Copy-Item -Path "$env:CI_PROJECT_DIR\*" -Destination "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME" -Recurse;
       } else {
         Write-Host "Branch name does not match the pattern. Skipping..."
       }
