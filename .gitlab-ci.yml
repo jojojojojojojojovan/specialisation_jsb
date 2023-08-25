@@ -26,10 +26,10 @@ copy_to_local_folder:
 build_jar_file:
   stage: build
   script:
-    - .\build\build.ps1
+    - $BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME\build\build.ps1
   artifacts:
     paths:
-      - ./target/$env:CI_COMMIT_REF_NAME.jar
+      - $BUILD_SVR_PATH/$env:CI_COMMIT_REF_NAME/target/*.jar
 
 # copy_to_local_folder:
 #   stage: transfer_bin
