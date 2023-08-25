@@ -4,9 +4,11 @@ stages:
 copy_to_local_folder:
   stage: transfer
   script:
-    - mkdir -p "C:\Users\commonuser\Documents\mss-academy-projects\specialization\build_svr" 2>nul
-    - xcopy /E /I "%CI_PROJECT_DIR%\*" "C:\Users\commonuser\Documents\mss-academy-projects\specialization\build_svr"
+    - if echo "%CI_COMMIT_REF_NAME%"| findstr /R "^r_jsb_[0-9]*_[0-9]*$" > nul; then
+        md "C:\path\to\your\specific\folder" 2>nul
+        xcopy /E /I "%CI_PROJECT_DIR%\*" "C:\path\to\your\specific\folder"
+      else
+        echo "Branch name does not match the pattern. Skipping..."
+      fi
   only:
     - branches
-  variables:
-    - $CI_COMMIT_REF_NAME =~ /^r_jsb_\d+_\d+$/
