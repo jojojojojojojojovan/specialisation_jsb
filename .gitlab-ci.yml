@@ -31,6 +31,7 @@ build_jar_file:
   script:
     - Write-Host $ARTIFACT_PATH
     - Write-Host "$BUILD_SVR_PATH\\$env:CI_COMMIT_REF_NAME\\build\\build.ps1"
+    - cd "$BUILD_SVR_PATH\\$env:CI_COMMIT_REF_NAME"
     - "& $BUILD_SVR_PATH\\$env:CI_COMMIT_REF_NAME\\build\\build.ps1"
   artifacts:
     paths:
