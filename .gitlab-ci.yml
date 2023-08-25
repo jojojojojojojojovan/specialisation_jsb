@@ -14,9 +14,14 @@ copy_to_local_folder:
   script:
     - Write-Host "Executing copy"
     - $match = $env:CI_COMMIT_REF_NAME -match "^r_jsb_\d+_\d+$"
+     -  if (Test-Path "$BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME") {
+          Remove-Item -Path "$BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME" -Recurse -Force;
+          New-Item -Path "$BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME" -ItemType Directory -Force;
+        }
     - if ($match) {
         if (Test-Path "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME") {
           Remove-Item -Path "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME" -Recurse -Force;
+          New-Item -Path "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME" -ItemType Directory -Force;
         }
         New-Item -Path "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME" -ItemType Directory -Force;
         Copy-Item -Path "$env:CI_PROJECT_DIR\*" -Destination "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME" -Recurse;
@@ -35,6 +40,7 @@ build_jar_file:
     - Write-Host "$BUILD_SVR_PATH\\$env:CI_COMMIT_REF_NAME\\build\\build.ps1"
     - cd "$BUILD_SVR_PATH\\$env:CI_COMMIT_REF_NAME"
     - "& $BUILD_SVR_PATH\\$env:CI_COMMIT_REF_NAME\\build\\build.ps1"
+
   artifacts:
     paths:
       - $ARTIFACT_PATH
@@ -42,22 +48,7 @@ build_jar_file:
 copy_to_bin_repo:
   stage: transfer_bin
   script:
-    - if (Test-Path "$BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME") {
-          Remove-Item -Path "$BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME" -Recurse -Force;
-      }
-      New-Item -Path "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME" -ItemType Directory -Force;
-      Copy-Item -Path "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME\" -Destination "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME" -Recurse;
-
-# copy_to_local_folder:
-#   stage: transfer_bin
-#   script:
-#     - Write-Host "Executing copy"
-#     - $match = $env:CI_COMMIT_REF_NAME -match "^r_jsb_\d+_\d+$"
-#     - if ($match) {
-#         New-Item -Path "C:\Users\commonuser\Documents\mss-academy-projects\specialization\build_svr" -ItemType Directory -Force;
-#         Copy-Item -Path "$env:CI_PROJECT_DIR\*" -Destination "C:\Users\commonuser\Documents\mss-academy-projects\specialization\build_svr" -Recurse;
-#       } else {
-#         Write-Host "Branch name does not match the pattern. Skipping..."
-#       }
-#   only:
-#     - branches
+    - Copy-Item -Path "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME\bin" -Destination "$BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME" -Recurse;
+    - Copy-Item -Path "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME\deploy" -Destination "$BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME" -Recurse;
+    - Copy-Item -Path "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME\config" -Destination "$BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME" -Recurse;
+    # - Copy-Item -Path "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME\test" -Destination "$BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME" -Recurse;

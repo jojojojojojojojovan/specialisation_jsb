@@ -11,7 +11,9 @@ $mvnwPath = "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME\mvnw"
 cmd /c $mvnwPath clean package -DskipTests -Pexclude-properties
 
 docker build -t "$env:CI_COMMIT_REF_NAME" .
-New-Item -Path . -Name bin -ItemType "directory" -Force
+if (Test-Path "bin\$env:CI_COMMIT_REF_NAME.tar") {
+    Remove-Item -Path "bin\$env:CI_COMMIT_REF_NAME.tar" -Recurse -Force;
+}
 docker save -o ".\bin\$env:CI_COMMIT_REF_NAME.tar" "$env:CI_COMMIT_REF_NAME"
 
 # Copy the application.properties file into the target directory
