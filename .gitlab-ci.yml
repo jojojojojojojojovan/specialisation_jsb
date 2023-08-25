@@ -1,16 +1,40 @@
 stages:
-  - transfer
+  - transfer_build
+  - build
+  - transfer_bin
 
 copy_to_local_folder:
-  stage: transfer
+  stage: transfer_build
   script:
     - Write-Host "Executing copy"
     - $match = $env:CI_COMMIT_REF_NAME -match "^r_jsb_\d+_\d+$"
     - if ($match) {
-        New-Item -Path "C:\Users\commonuser\Documents\mss-academy-projects\specialization\build_svr" -ItemType Directory -Force;
-        Copy-Item -Path "$env:CI_PROJECT_DIR\*" -Destination "C:\Users\commonuser\Documents\mss-academy-projects\specialization\build_svr" -Recurse;
+        New-Item -Path "C:\Users\commonuser\Documents\mss-academy-projects\specialization\build_svr\$env:CI_COMMIT_REF_NAME" -ItemType Directory -Force;
+        Copy-Item -Path "$env:CI_PROJECT_DIR\*" -Destination "C:\Users\commonuser\Documents\mss-academy-projects\specialization\build_svr\$env:CI_COMMIT_REF_NAME" -Recurse;
       } else {
         Write-Host "Branch name does not match the pattern. Skipping..."
       }
   only:
     - branches
+
+build_jar_file:
+  stage: build
+  script:
+    - ./build.sh
+  artifacts:
+    paths:
+      - ./target/$env:CI_COMMIT_REF_NAME.jar
+
+# copy_to_local_folder:
+#   stage: transfer_bin
+#   script:
+#     - Write-Host "Executing copy"
+#     - $match = $env:CI_COMMIT_REF_NAME -match "^r_jsb_\d+_\d+$"
+#     - if ($match) {
+#         New-Item -Path "C:\Users\commonuser\Documents\mss-academy-projects\specialization\build_svr" -ItemType Directory -Force;
+#         Copy-Item -Path "$env:CI_PROJECT_DIR\*" -Destination "C:\Users\commonuser\Documents\mss-academy-projects\specialization\build_svr" -Recurse;
+#       } else {
+#         Write-Host "Branch name does not match the pattern. Skipping..."
+#       }
+#   only:
+#     - branches

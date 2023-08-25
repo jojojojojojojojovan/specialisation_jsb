@@ -1,26 +1,18 @@
-# Use the official maven/Java 8 image to create a build-time image
-FROM maven:3.6.0-jdk-8 as builder
+# Use an OpenJDK base image
+FROM openjdk:17-jdk-slim
 
-# Set the current working directory inside the image
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copy the pom.xml file to download dependencies
-COPY ./pom.xml ./pom.xml
+# Copy the compiled JAR file from the local machine to the container
+COPY target/*.jar /app/tmsapp.jar
 
-# Build all the dependencies in preparation to go offline
-RUN mvn dependency:go-offline -B
+RUN adduser -u 1100 --disabled-password dockerbuilder
 
-# Copy the project source
-COPY ./src ./src
+USER dockerbuilder
 
-# Package the application
-RUN mvn package -DskipTests
+# Expose the port that the Spring Boot application listens on
+EXPOSE 8080
 
-# Use OpenJDK to run the app
-FROM openjdk:8-jre-alpine
-
-# Set application's jar to app.jar
-COPY --from=builder /app/target/*.jar app.jar
-
-# Run the jar
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Command to run the Spring Boot application
+CMD ["java", "-jar", "tmsapp.jar"]
