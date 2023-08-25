@@ -2,6 +2,8 @@
 $ErrorActionPreference = "Stop"
 
 Write-Host "build.ps1 running..."
+Write-Host $PWD
+Write-Host (Get-ChildItem)
 
 # Run the Maven Wrapper command
 ./mvnw clean package -DskipTests -Pexclude-properties

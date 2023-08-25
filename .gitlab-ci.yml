@@ -8,6 +8,7 @@ variables:
 
 copy_to_local_folder:
   stage: transfer_build
+  
   script:
     - Write-Host "Executing copy"
     - $match = $env:CI_COMMIT_REF_NAME -match "^r_jsb_\d+_\d+$"
@@ -25,12 +26,15 @@ copy_to_local_folder:
 
 build_jar_file:
   stage: build
+  before_script:
+    - $ARTIFACT_PATH="${BUILD_SVR_PATH}/${env:CI_COMMIT_REF_NAME}/target/*.jar"
   script:
+    - Write-Host $ARTIFACT_PATH
     - Write-Host "$BUILD_SVR_PATH\\$env:CI_COMMIT_REF_NAME\\build\\build.ps1"
     - "& $BUILD_SVR_PATH\\$env:CI_COMMIT_REF_NAME\\build\\build.ps1"
   artifacts:
     paths:
-      - $BUILD_SVR_PATH/$env:CI_COMMIT_REF_NAME/target/*.jar
+      - $ARTIFACT_PATH
 
 # copy_to_local_folder:
 #   stage: transfer_bin
