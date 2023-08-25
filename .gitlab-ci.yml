@@ -5,6 +5,8 @@ stages:
 
 variables:
   BUILD_SVR_PATH: "C:\\Users\\commonuser\\Documents\\mss-academy-projects\\specialization\\build_svr"
+  BIN_REPO_SVR_PATH: "C:\\Users\\commonuser\\Documents\\mss-academy-projects\\specialization\\bin_repo_svr"
+
 
 copy_to_local_folder:
   stage: transfer_build
@@ -27,7 +29,7 @@ copy_to_local_folder:
 build_jar_file:
   stage: build
   before_script:
-    - $ARTIFACT_PATH="${BUILD_SVR_PATH}/${env:CI_COMMIT_REF_NAME}/target/*.jar"
+    - $ARTIFACT_PATH="${BUILD_SVR_PATH}\${env:CI_COMMIT_REF_NAME}\target\*.jar"
   script:
     - Write-Host $ARTIFACT_PATH
     - Write-Host "$BUILD_SVR_PATH\\$env:CI_COMMIT_REF_NAME\\build\\build.ps1"
@@ -36,6 +38,15 @@ build_jar_file:
   artifacts:
     paths:
       - $ARTIFACT_PATH
+
+copy_to_bin_repo:
+  stage: transfer_bin
+  script:
+    - if (Test-Path "$BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME") {
+          Remove-Item -Path "$BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME" -Recurse -Force;
+      }
+      New-Item -Path "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME" -ItemType Directory -Force;
+      Copy-Item -Path "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME\" -Destination "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME" -Recurse;
 
 # copy_to_local_folder:
 #   stage: transfer_bin
