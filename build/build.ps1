@@ -6,7 +6,8 @@ Write-Host $PWD
 Write-Host (Get-ChildItem)
 
 # Run the Maven Wrapper command
-./mvnw clean package -DskipTests -Pexclude-properties
+Write-Host "$BUILD_SVR_PATH/$env:CI_COMMIT_REF_NAME/mvnw"
+$BUILD_SVR_PATH/$env:CI_COMMIT_REF_NAME/mvnw clean package -DskipTests -Pexclude-properties
 
 # Copy the application.properties file into the target directory
 Copy-Item -Path "src\main\resources\application.properties" -Destination "config\application.properties"
