@@ -22,7 +22,6 @@ copy_to_local_folder:
     - if ($match) {
         if (Test-Path "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME") {
           Remove-Item -Path "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME" -Recurse -Force;
-          New-Item -Path "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME" -ItemType Directory -Force;
         }
         New-Item -Path "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME" -ItemType Directory -Force;
         Copy-Item -Path "$env:CI_PROJECT_DIR\*" -Destination "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME" -Recurse;
@@ -41,7 +40,7 @@ build_jar_file:
     - Write-Host "$BUILD_SVR_PATH\\$env:CI_COMMIT_REF_NAME\\build\\build.ps1"
     - cd "$BUILD_SVR_PATH\\$env:CI_COMMIT_REF_NAME"
     - "& $BUILD_SVR_PATH\\$env:CI_COMMIT_REF_NAME\\build\\build.ps1"
-    - tar -cf "$env:CI_COMMIT_REF_NAME.tar" "build" "bin" "deploy" "config" "test"
+    - tar -cf "$env:CI_COMMIT_REF_NAME.tar" "build" "bin" "deploy" "config"
   artifacts:
     paths:
       - $ARTIFACT_PATH
