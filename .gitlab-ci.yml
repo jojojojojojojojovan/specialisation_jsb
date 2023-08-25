@@ -4,7 +4,7 @@ stages:
   - transfer_bin
 
 variables:
-  BUILD_SVR_PATH: "C:\\Users\commonuser\\Documents\\mss-academy-projects\\specialization\\build_svr"
+  BUILD_SVR_PATH: "C:\\Users\\commonuser\\Documents\\mss-academy-projects\\specialization\\build_svr"
 
 copy_to_local_folder:
   stage: transfer_build
