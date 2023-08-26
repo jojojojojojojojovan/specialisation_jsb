@@ -27,6 +27,7 @@ copy_to_local_folder:
         Copy-Item -Path "$env:CI_PROJECT_DIR\*" -Destination "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME" -Recurse;
       } else {
         Write-Host "Branch name does not match the pattern. Skipping..."
+        exit
       }
   only:
     - branches
