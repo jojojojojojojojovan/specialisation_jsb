@@ -47,7 +47,7 @@ build_jar_file:
       if(Test-Path "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME\$env:CI_COMMIT_REF_NAME.tar") {
         Remove-Item -Path "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME\$env:CI_COMMIT_REF_NAME.tar" -Force
       }
-    - tar -cf "$env:CI_COMMIT_REF_NAME.tar" "build" "bin" "deploy" "config"
+    - tar -cf "$env:CI_COMMIT_REF_NAME.tar" "bin" "deploy" "config" "test"
   artifacts:
     paths:
       - $ARTIFACT_PATH
