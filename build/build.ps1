@@ -14,6 +14,8 @@ docker build -t "$env:CI_COMMIT_REF_NAME" .
 if (Test-Path "bin\$env:CI_COMMIT_REF_NAME.tar") {
     Remove-Item -Path "bin\$env:CI_COMMIT_REF_NAME.tar" -Recurse -Force;
 }
+New-Item -Path "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME\bin" -ItemType Directory -Force;
+
 docker save -o ".\bin\$env:CI_COMMIT_REF_NAME.tar" "$env:CI_COMMIT_REF_NAME"
 
 # Copy the application.properties file into the target directory
