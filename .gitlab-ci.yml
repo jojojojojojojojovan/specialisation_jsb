@@ -15,10 +15,10 @@ copy_to_local_folder:
   script:
     - Write-Host "Executing copy"
     - $match = $env:CI_COMMIT_REF_NAME -match "^r_jsb_\d+_\d+$"
-     -  if (Test-Path "$BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME") {
-          Remove-Item -Path "$BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME" -Recurse -Force;
-          New-Item -Path "$BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME" -ItemType Directory -Force;
-        }
+    - if (Test-Path "$BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME") {
+        Remove-Item -Path "$BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME" -Recurse -Force;
+        New-Item -Path "$BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME" -ItemType Directory -Force;
+      }
     - if ($match) {
         if (Test-Path "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME") {
           Remove-Item -Path "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME" -Recurse -Force;
