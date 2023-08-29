@@ -1,8 +1,7 @@
 stages:
-  - transfer_build
   - build
-  - transfer_bin
-  - ssh
+  - publish
+  - deliver
 
 variables:
   BUILD_SVR_PATH: "C:\\Users\\commonuser\\Documents\\mss-academy-projects\\specialization\\build_svr"
@@ -10,7 +9,7 @@ variables:
 
 
 copy_to_local_folder:
-  stage: transfer_build
+  stage: build
   
   script:
     - Write-Host "Executing copy"
@@ -32,15 +31,13 @@ copy_to_local_folder:
         exit 1;
       }
   only:
-    - branches
+    - /^r_jsb_\d+_\d+$/
 
 build_jar_file:
   stage: build
   before_script:
     - $ARTIFACT_PATH="${BUILD_SVR_PATH}\${env:CI_COMMIT_REF_NAME}\target\*.jar"
   script:
-    - Write-Host $ARTIFACT_PATH
-    - Write-Host "$BUILD_SVR_PATH\\$env:CI_COMMIT_REF_NAME\\build\\build.ps1"
     - cd "$BUILD_SVR_PATH\\$env:CI_COMMIT_REF_NAME"
     - "& $BUILD_SVR_PATH\\$env:CI_COMMIT_REF_NAME\\build\\build.ps1"
     - |
@@ -51,9 +48,9 @@ build_jar_file:
   artifacts:
     paths:
       - $ARTIFACT_PATH
-
+ 
 copy_to_bin_repo:
-  stage: transfer_bin
+  stage: publish
   script:
     - |
       if(Test-Path "$BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME\$env:CI_COMMIT_REF_NAME.tar") {
