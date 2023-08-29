@@ -31,7 +31,7 @@ public class ApplicationController {
     }
 
     //INPUT: un, gn, acronym, startDate, endDate, rnumber, description(OPTIONAL), create(OPTIONAL), open(OPTIONAL), todo(OPTIONAL), doing(OPTIONAL), done(OPTIONAL)
-    @PostMapping("/createApplication")
+    @PostMapping(path = "/createApplication", name = "security.enabled")
     public ResponseEntity<Map<String, Object>> createApplication(@RequestBody Map<String, Object> req) {
         Map<String, Object> response = new HashMap<>();
         response.putAll(applicationService.createApplication(req));
