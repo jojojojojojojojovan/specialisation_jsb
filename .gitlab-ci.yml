@@ -69,7 +69,6 @@ setup_ssh:
     - icacls "C:\Users\commonuser\.ssh\gitlab-ci" /inheritance:d
     - icacls "C:\Users\commonuser\.ssh\gitlab-ci" /grant:r "$($env:USERNAME):R"
     - scp -i "C:\Users\commonuser\.ssh\gitlab-ci" "$BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME\$env:CI_COMMIT_REF_NAME.tar" "$($env:REMOTE_USER)@$($env:REMOTE_HOST):\C:\Users\l1ds\group1\"
-    - ssh $env:REMOTE_USER@$env:REMOTE_HOST "tar -xf 'C:\Users\l1ds\group1\$($env:CI_COMMIT_REF_NAME).tar' -C 'C:\Users\l1ds\group1\'"
 
 untar:
   stage: untar
