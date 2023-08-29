@@ -74,7 +74,7 @@ setup_ssh:
 untar:
   stage: untar
   script:
-    - ssh -i "C:\Users\commonuser\.ssh\gitlab-ci" "$($env:REMOTE_USER)@$($env:REMOTE_HOST)" "New-Item -Path 'C:\Users\l1ds\group1\r_jsb_3_4' -ItemType Directory -Force"
+    - ssh -i "C:\Users\commonuser\.ssh\gitlab-ci" "$($env:REMOTE_USER)@$($env:REMOTE_HOST)" "New-Item -Path 'C:\Users\l1ds\group1\$($env:CI_COMMIT_REF_NAME)' -ItemType Directory -Force"
     - ssh -i "C:\Users\commonuser\.ssh\gitlab-ci" "$($env:REMOTE_USER)@$($env:REMOTE_HOST)" "tar -xvf 'C:\Users\l1ds\group1\$($env:CI_COMMIT_REF_NAME).tar' -C 'C:\Users\l1ds\group1\$($env:CI_COMMIT_REF_NAME)'"
     - ssh -i "C:\\Users\\commonuser\\.ssh\\gitlab-ci" "$($env:REMOTE_USER)@$($env:REMOTE_HOST)" "docker load -i 'C:\\Users\\l1ds\\group1\\$($env:CI_COMMIT_REF_NAME)\\bin\\$($env:CI_COMMIT_REF_NAME).tar'"
     - ssh -i "C:\\Users\\commonuser\\.ssh\\gitlab-ci" "$($env:REMOTE_USER)@$($env:REMOTE_HOST)" "docker run --name $($env:CI_COMMIT_REF_NAME) --env-file 'C:\Users\l1ds\group1\$($env:CI_COMMIT_REF_NAME)\config\application.properties' -p 8080:8080 ($env:CI_COMMIT_REF_NAME)"
