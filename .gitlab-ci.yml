@@ -65,7 +65,8 @@ setup_ssh:
   script:
     - $env:SSH_AUTH_SOCK = Start-Service ssh-agent
     - Set-Content -Path commonuser\.ssh\gitlab-ci -Value $env:SSH_PRIVATE_KEY
-    - chmod 600 commonuser\.ssh\id_rsa
-    - scp /path/on/runner/file.tar $env:REMOTE_USER@$env:REMOTE_HOST:/destination/path/on/remote/
-    - ssh $env:REMOTE_USER@$env:REMOTE_HOST "your-command-here"
-# ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDZ0eFjWTc/c6DpVXN8XAzhykX+60f+B5lGigh5UuyJcyJM6+Gbj9uqJru8eOzY4zX65W+DVq5Pov3dbaGJp29ktmKGBbuBRl2gP5ed39LEJ20UdVlVpaKdk9S1K0CUveQYlBa0/Xi8kUM7h+iFiWXo+moRzNJaRcwtCp80wGL6jRVbnKyco4UXl1F0TSs2lMgnb5AoaDLuYr40ABN4g3eoJ9BkzYjKz/LIxN7Ire8EaZjW+cwyKTn0/KUXprQ/GpPyKsGSfO1vLFM5P5Xg/lcWj3qF9FtP3961cvauSN2dNOYybHxIH3J9IxVmLQMoFwliNgKptR54+OfDdyln117sHIHrCzr1gL4aPz5q77XO3fkMXY1RBx2HE1SypqDN45pL2kw+4kAFgDjmSXb5InbMawuLJSnIB4+IYbNWouxmU60c7tDps7Nljqia3bdE7jB1pwDst3bIP9hkPrag8gK1YRLV6ZeAVuwm5+GiLJZQJRs6kTmYXak9BB3Y9sNoNNLIV3a2SWY7daB+1j1tfLOPZTPHYXIcsL6ZFq2JsMNbLsgMqKTtDXWFONkvNi4gmo9F5LBxUqNW5KJNhNCOqWYrT2vcA7ItURifXSIjdQYF2VNZWXQE1EiNcO9gvXA2xLmfNwlbEoqk6UyvEGA2vjrEIwqHzuoAXesn4ZcfL9rcjQ== gitlab-cicd
+    - chmod 600 commonuser\.ssh\gitlab-ci
+    - Write-Host "$env:REMOTE_USER@$env:REMOTE_HOST:\C:\Users\l1ds\group1"
+    - scp $BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME\$env:CI_COMMIT_REF_NAME.tar $env:REMOTE_USER@$env:REMOTE_HOST:\C:\Users\l1ds\group1\
+    # - ssh $env:REMOTE_USER@$env:REMOTE_HOST "your-command-here"
+# ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDPg9gAqbu7Q9cvG4Ui04YSQGGdaJxh9sZbf947YBEJo7fEo6iTWjIIAh8GeTINqfc5pXqns5xaGqgkl/w6XSejXxX+RmesVLeTwNu9Ktg/CLeH08kGcCs0PR3w9F/ciM9465iETPna7yU4QQglxZXfOe3uyQ8DaEr6tcvvqtrn4CgYChrYwBCwVtioCun/so61VQV3zPqrxqF6npKzSXg/kvYsa+MeldV5lcEoen8MpvSXaxxSdP2h3tR0cByt1XLVlAku3Q+Elqq0yk7ygRGx0qLZSbM5Pgd/D2YFdnF10OWyWgf2rF5TgxtR0ii0ADd0c7p67oU3MxXH7MT8KfBY54LMrzGVrAdIpbv9FWmGLeIfbwVH1LARBGLglJfiApx1JWtmk10Cl92hp92sCxXJ5fbqDm4NWULZ4nYtEQ/AUTWtK1ePAE+10NsXhPsAXOHhLeaNhRUZ0WHPFzSp9ZVOLYizZ7IJHhoZxVyWNSaCSckGWhm5AfN+VVnY1BqM9Qh2f/RCy7h9lCeRgh+Hz0ErScjBu0PLA8xnn0OTV+aCo76IceXufXE7sAdyFvNTiONPOgIUflWa04dYsvrJuKftV3cq75dj6KZWfmX0bENZREkt5I4Fo1Af+XSPNcBGrLeet3cZztmL0hP5j7oon9RSK+yzVLtxLGwDvjwGSeeUtw== gitlab-cicd
