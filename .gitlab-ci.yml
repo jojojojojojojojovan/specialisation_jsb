@@ -60,7 +60,12 @@ copy_to_bin_repo:
     - Copy-Item -Path "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME\$env:CI_COMMIT_REF_NAME.tar" -Destination "$BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME\$env:CI_COMMIT_REF_NAME.tar";
     - tar -tf "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME\$env:CI_COMMIT_REF_NAME.tar";
 
-# prepare_ssh:
-#   stage: ssh
-#   script:
-#     - 
+setup_ssh:
+  stage: deliver
+  script:
+    - $env:SSH_AUTH_SOCK = Start-Service ssh-agent
+    - Set-Content -Path commonuser\.ssh\gitlab-ci -Value $env:SSH_PRIVATE_KEY
+    - chmod 600 commonuser\.ssh\id_rsa
+    - scp /path/on/runner/file.tar $env:REMOTE_USER@$env:REMOTE_HOST:/destination/path/on/remote/
+    - ssh $env:REMOTE_USER@$env:REMOTE_HOST "your-command-here"
+# ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDZ0eFjWTc/c6DpVXN8XAzhykX+60f+B5lGigh5UuyJcyJM6+Gbj9uqJru8eOzY4zX65W+DVq5Pov3dbaGJp29ktmKGBbuBRl2gP5ed39LEJ20UdVlVpaKdk9S1K0CUveQYlBa0/Xi8kUM7h+iFiWXo+moRzNJaRcwtCp80wGL6jRVbnKyco4UXl1F0TSs2lMgnb5AoaDLuYr40ABN4g3eoJ9BkzYjKz/LIxN7Ire8EaZjW+cwyKTn0/KUXprQ/GpPyKsGSfO1vLFM5P5Xg/lcWj3qF9FtP3961cvauSN2dNOYybHxIH3J9IxVmLQMoFwliNgKptR54+OfDdyln117sHIHrCzr1gL4aPz5q77XO3fkMXY1RBx2HE1SypqDN45pL2kw+4kAFgDjmSXb5InbMawuLJSnIB4+IYbNWouxmU60c7tDps7Nljqia3bdE7jB1pwDst3bIP9hkPrag8gK1YRLV6ZeAVuwm5+GiLJZQJRs6kTmYXak9BB3Y9sNoNNLIV3a2SWY7daB+1j1tfLOPZTPHYXIcsL6ZFq2JsMNbLsgMqKTtDXWFONkvNi4gmo9F5LBxUqNW5KJNhNCOqWYrT2vcA7ItURifXSIjdQYF2VNZWXQE1EiNcO9gvXA2xLmfNwlbEoqk6UyvEGA2vjrEIwqHzuoAXesn4ZcfL9rcjQ== gitlab-cicd
