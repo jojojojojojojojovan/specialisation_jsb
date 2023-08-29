@@ -1,5 +1,5 @@
 # Set the URI
-$uri = "http://localhost:8080/api/accounts/create"
+$uri = "http://localhost:8080/api/accounts/updateAccount"
 
 # Create headers
 $headers = @{
@@ -8,19 +8,15 @@ $headers = @{
 
 # Create the request body
 $body = @{
-    account = @{
-        username = "admin1"
-        password = "p@ssword1"
-        status   = 1
-        groups   = @(
-            @{ groupName = "admin" },
-            @{ groupName = "project leader" }
-        )
-    }
+    username = "admin"
+    newPassword = "abc123!!"
+    verifyPassword = "abc123!!"
+    email = "test@test.comasd"
+    
 } | ConvertTo-Json -Depth 10
 
 # Make the REST API call
-$response = Invoke-RestMethod -Method Post -Uri $uri -Headers $headers -Body $body
+$response = Invoke-RestMethod -Method Put -Uri $uri -Headers $headers -Body $body
 
 # Optionally print the response
 Write-Output $response
