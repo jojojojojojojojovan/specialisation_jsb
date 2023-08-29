@@ -1,7 +1,7 @@
 # Set the URI
 $uri = "http://localhost:8080/api/accounts/create"
 
-# Create headers
+# Create headers for content type
 $headers = @{
     'Content-Type' = 'application/json'
 }
@@ -9,20 +9,29 @@ $headers = @{
 # Create the request body
 $body = @{
     account = @{
-        username = "admin1"
+        username = "admin8"
         password = "p@ssword1"
         status   = 1
         groups   = @(
-            @{ groupName = "admin" },
-            @{ groupName = "project leader" }
+            @{ groupName = "admin" }
         )
     }
-} | ConvertTo-Json -Depth 10
+}
 
-# Make the REST API call
-$response = Invoke-RestMethod -Method Post -Uri $uri -Headers $headers -Body $body
+# Convert the body to JSON
+$jsonBody = $body | ConvertTo-Json -Depth 10
 
-# Optionally print the response
-Write-Output $response
+# Setting up the Cookie as a Web Session
+$webSession = New-Object Microsoft.PowerShell.Commands.WebRequestSession
+$authTokenValue = "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImlwIjoiMDowOjA6MDowOjA6MDoxIiwidXNlckFnZW50IjoiUG9zdG1hblJ1bnRpbWUvNy4zMi4zIiwiZXhwIjoxNjkzMzQ2NDAwfQ.5Ky0tRPeDD0vBdRTPfXDyAMFKkn8F8HnemQ4ciWL_mrZHYUdv-C0vkzd8yZctuxRs_nYW8ztd6AxWIDLRucHYw"
+$webSession.Cookies.Add((New-Object System.Net.Cookie("authToken", $authTokenValue, "/", "localhost")))
 
-# ... continue with any additional logic or tests ...
+# Make the REST API call using Invoke-RestMethod
+$response = Invoke-RestMethod -Method Post -Uri $uri -Headers $headers -Body $jsonBody -WebSession $webSession
+
+# Display the response
+return $response
+
+
+
+

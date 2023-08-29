@@ -1,5 +1,5 @@
 $expectedOutput = @{
-    "test1.ps1" = ""
+    "test1.ps1" = $true;
     "test2.ps1" = $true;
 }
 
