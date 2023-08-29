@@ -5,7 +5,7 @@ $headers = @{
     'Content-Type'  = 'application/json'
 }
 $body = @{
-    'appAcronym' = 'A1'
+    'appAcronym' = 'App'
 } | ConvertTo-Json -Depth 10
 
 # Make the API call

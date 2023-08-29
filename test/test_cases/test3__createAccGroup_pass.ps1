@@ -19,4 +19,3 @@ $response = Invoke-RestMethod -Method Post -Uri $uri -Headers $headers -Body $bo
 
 # Optionally print the response
 Write-Output $response
-return $response
