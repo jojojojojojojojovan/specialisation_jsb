@@ -10,8 +10,8 @@ $headers = @{
 $body = @{
     username = "admin"
     newPassword = "abc123!!"
-    verifyPassword = "abc123!!"
-    email = "test@test.comasd"
+    verifyPassword = "p@ssw0rd"
+    email = "testtest.com"
     
 } | ConvertTo-Json -Depth 10
 

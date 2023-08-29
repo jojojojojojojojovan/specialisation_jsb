@@ -42,7 +42,7 @@ public class TmsApplication {
 		Map<String, Object> groups = new HashMap<>();
 		groups.put("groupName", "admin");
 		account.put("username", "admin");
-		account.put("password", "p@ssword1");
+		account.put("password", "p@ssw0rd");
 		account.put("status", 1);
 		List<Object> groupsList = new ArrayList<Object>();
 		groupsList.add(groups);
