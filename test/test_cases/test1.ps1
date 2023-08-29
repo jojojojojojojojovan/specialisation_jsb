@@ -18,7 +18,7 @@ $body = @{
     }
 }
 
-# Convert the body to JSON
+# Convert the body to JSONgit
 $jsonBody = $body | ConvertTo-Json -Depth 10
 
 # Setting up the Cookie as a Web Session
