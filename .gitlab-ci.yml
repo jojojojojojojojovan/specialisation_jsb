@@ -64,7 +64,7 @@ setup_ssh:
   stage: deliver
   script:
     - $env:SSH_AUTH_SOCK = Start-Service ssh-agent
-    - Set-Content -Path commonuser\.ssh\gitlab-ci -Value $env:SSH_PRIVATE_KEY
+    - Set-Content -Path C:\Users\commonuser\.ssh\gitlab-ci -Value $env:SSH_PRIVATE_KEY
     - Write-Host "$env:REMOTE_USER@$env:REMOTE_HOST:\C:\Users\l1ds\group1"
     - scp $BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME\$env:CI_COMMIT_REF_NAME.tar $env:REMOTE_USER@$env:REMOTE_HOST:\C:\Users\l1ds\group1\
     # - ssh $env:REMOTE_USER@$env:REMOTE_HOST "your-command-here"
