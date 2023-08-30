@@ -1,8 +1,8 @@
 stages:
-  - transfer_build
   - build
-  - transfer_bin
-  - ssh
+  - publish
+  - deliver
+  - untar
 
 variables:
   BUILD_SVR_PATH: "C:\\Users\\commonuser\\Documents\\mss-academy-projects\\specialization\\build_svr"
@@ -10,7 +10,7 @@ variables:
 
 
 copy_to_local_folder:
-  stage: transfer_build
+  stage: build
   
   script:
     - Write-Host "Executing copy"
@@ -32,15 +32,13 @@ copy_to_local_folder:
         exit 1;
       }
   only:
-    - branches
+    - /^r_jsb_\d+_\d+$/
 
 build_jar_file:
   stage: build
   before_script:
     - $ARTIFACT_PATH="${BUILD_SVR_PATH}\${env:CI_COMMIT_REF_NAME}\target\*.jar"
   script:
-    - Write-Host $ARTIFACT_PATH
-    - Write-Host "$BUILD_SVR_PATH\\$env:CI_COMMIT_REF_NAME\\build\\build.ps1"
     - cd "$BUILD_SVR_PATH\\$env:CI_COMMIT_REF_NAME"
     - "& $BUILD_SVR_PATH\\$env:CI_COMMIT_REF_NAME\\build\\build.ps1"
     - |
@@ -51,9 +49,9 @@ build_jar_file:
   artifacts:
     paths:
       - $ARTIFACT_PATH
-
+ 
 copy_to_bin_repo:
-  stage: transfer_bin
+  stage: publish
   script:
     - |
       if(Test-Path "$BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME\$env:CI_COMMIT_REF_NAME.tar") {
@@ -63,7 +61,24 @@ copy_to_bin_repo:
     - Copy-Item -Path "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME\$env:CI_COMMIT_REF_NAME.tar" -Destination "$BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME\$env:CI_COMMIT_REF_NAME.tar";
     - tar -tf "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME\$env:CI_COMMIT_REF_NAME.tar";
 
-# prepare_ssh:
-#   stage: ssh
-#   script:
-#     - 
+setup_ssh:
+  stage: deliver
+  script:
+    - $env:SSH_AUTH_SOCK = Start-Service ssh-agent
+    - Set-Content -Path C:\Users\commonuser\.ssh\gitlab-ci -Value $env:SSH_PRIVATE_KEY
+    - icacls "C:\Users\commonuser\.ssh\gitlab-ci" /inheritance:d
+    - icacls "C:\Users\commonuser\.ssh\gitlab-ci" /grant:r "$($env:USERNAME):R"
+    - scp -i "C:\Users\commonuser\.ssh\gitlab-ci" "$BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME\$env:CI_COMMIT_REF_NAME.tar" "$($env:REMOTE_USER)@$($env:REMOTE_HOST):\C:\Users\l1ds\group1\"
+    - ssh $env:REMOTE_USER@$env:REMOTE_HOST "tar -xf 'C:\Users\l1ds\group1\$($env:CI_COMMIT_REF_NAME).tar' -C 'C:\Users\l1ds\group1\'"
+
+untar:
+  stage: untar
+  script:
+    - ssh -i "C:\Users\commonuser\.ssh\gitlab-ci" "$($env:REMOTE_USER)@$($env:REMOTE_HOST)" "New-Item -Path 'C:\Users\l1ds\group1\$($env:CI_COMMIT_REF_NAME)' -ItemType Directory -Force"
+    - ssh -i "C:\Users\commonuser\.ssh\gitlab-ci" "$($env:REMOTE_USER)@$($env:REMOTE_HOST)" "tar -xvf 'C:\Users\l1ds\group1\$($env:CI_COMMIT_REF_NAME).tar' -C 'C:\Users\l1ds\group1\$($env:CI_COMMIT_REF_NAME)'"
+    - ssh -i "C:\\Users\\commonuser\\.ssh\\gitlab-ci" "$($env:REMOTE_USER)@$($env:REMOTE_HOST)" "docker load -i 'C:\\Users\\l1ds\\group1\\$($env:CI_COMMIT_REF_NAME)\\bin\\$($env:CI_COMMIT_REF_NAME).tar'"
+    - ssh -i "C:\\Users\\commonuser\\.ssh\\gitlab-ci" "$($env:REMOTE_USER)@$($env:REMOTE_HOST)" "docker run --name $($env:CI_COMMIT_REF_NAME) --env-file 'C:\Users\l1ds\group1\$($env:CI_COMMIT_REF_NAME)\config\application.properties' -p 8080:8080 ($env:CI_COMMIT_REF_NAME)"
+    - ssh -i "C:\\Users\\commonuser\\.ssh\\gitlab-ci" "$($env:REMOTE_USER)@$($env:REMOTE_HOST)" "'C:\Users\l1ds\group1\$($env:CI_COMMIT_REF_NAME)\test\test.ps1'"
+
+
+# ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDPg9gAqbu7Q9cvG4Ui04YSQGGdaJxh9sZbf947YBEJo7fEo6iTWjIIAh8GeTINqfc5pXqns5xaGqgkl/w6XSejXxX+RmesVLeTwNu9Ktg/CLeH08kGcCs0PR3w9F/ciM9465iETPna7yU4QQglxZXfOe3uyQ8DaEr6tcvvqtrn4CgYChrYwBCwVtioCun/so61VQV3zPqrxqF6npKzSXg/kvYsa+MeldV5lcEoen8MpvSXaxxSdP2h3tR0cByt1XLVlAku3Q+Elqq0yk7ygRGx0qLZSbM5Pgd/D2YFdnF10OWyWgf2rF5TgxtR0ii0ADd0c7p67oU3MxXH7MT8KfBY54LMrzGVrAdIpbv9FWmGLeIfbwVH1LARBGLglJfiApx1JWtmk10Cl92hp92sCxXJ5fbqDm4NWULZ4nYtEQ/AUTWtK1ePAE+10NsXhPsAXOHhLeaNhRUZ0WHPFzSp9ZVOLYizZ7IJHhoZxVyWNSaCSckGWhm5AfN+VVnY1BqM9Qh2f/RCy7h9lCeRgh+Hz0ErScjBu0PLA8xnn0OTV+aCo76IceXufXE7sAdyFvNTiONPOgIUflWa04dYsvrJuKftV3cq75dj6KZWfmX0bENZREkt5I4Fo1Af+XSPNcBGrLeet3cZztmL0hP5j7oon9RSK+yzVLtxLGwDvjwGSeeUtw== gitlab-cicd
