@@ -1,5 +1,5 @@
 $expectedOutput = @{
-    "test1_createAcc.ps1" = $true;
+    "test1_createAcc.ps1" = $false;
     "test1_updateAcc_pass.ps1" = $true;
     "test1_updateAcc_fail.ps1"=$false
     "test2_getApp_fail.ps1" = $false;
@@ -8,13 +8,15 @@ $expectedOutput = @{
     "test4__createApp_pass.ps1" = $true;
 }
 
-$testCasesPath = "$PSScriptRoot/test_cases/"
+$testCasesPath = "$PSScriptRoot\test_cases\"
 
 Get-ChildItem -Path $testCasesPath -Filter *.ps1 | ForEach-Object {
     $scriptName = $_.Name
     Write-Host "Running $scriptName"
 
     $output = & "$testCasesPath\$scriptname"
+
+    Write-Host $output
 
     if($output.success -eq $expectedOutput[$scriptName]) {
         Write-Host "$scriptName PASSED" -ForegroundColor Green
@@ -24,4 +26,4 @@ Get-ChildItem -Path $testCasesPath -Filter *.ps1 | ForEach-Object {
     }
 }
 
-Write-Host "Tests completed!"
+Write-Host "Tests completed!!"
