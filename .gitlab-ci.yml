@@ -105,8 +105,6 @@ clear_docker:
 clear_folders:
   stage: clear
   script:
-    - |
-      if(Test-Path "$BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME\$env:CI_COMMIT_REF_NAME.tar") {
-        ssh "$($env:REMOTE_USER)@$($env:REMOTE_HOST)" "Remove-Item -Path 'C:\Users\l1ds\group1\$($env:CI_COMMIT_REF_NAME)' -Recurse -Force;"
-      }
+    - ssh "$($env:REMOTE_USER)@$($env:REMOTE_HOST)" "Remove-Item -Path 'C:\Users\l1ds\group1\$($env:CI_COMMIT_REF_NAME)' -Recurse -Force;"
+      
   allow_failure: true

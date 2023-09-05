@@ -9,7 +9,7 @@ $headers = @{
 # Create the request body
 $body = @{
     account = @{
-        username = "admin8"
+        username = "admin"
         password = "p@ssword1"
         status   = 1
         groups   = @(
