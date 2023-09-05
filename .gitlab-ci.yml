@@ -70,7 +70,7 @@ setup_ssh:
     # - Set-Content -Path C:\Users\commonuser\.ssh\gitlab-ci -Value $env:SSH_PRIVATE_KEY
     # - icacls "C:\Users\commonuser\.ssh\gitlab-ci" /inheritance:d
     # - icacls "C:\Users\commonuser\.ssh\gitlab-ci" /grant:r "$($env:USERNAME):R"
-    - scp "$BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME\$env:CI_COMMIT_REF_NAME.tar" "$($env:REMOTE_USER)@$($env:REMOTE_HOST):\C:\Users\l1ds\group1\"
+    - scp -v "$BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME\$env:CI_COMMIT_REF_NAME.tar" "$($env:REMOTE_USER)@$($env:REMOTE_HOST):\C:\Users\l1ds\group1\"
 
 untar:
   stage: deliver
