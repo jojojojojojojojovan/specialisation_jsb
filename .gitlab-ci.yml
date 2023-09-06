@@ -1,8 +1,12 @@
+workflow:
+  rules:
+    - if: $CI_COMMIT_REF_NAME =~ /^r_jsb_\d+_\d+$/
+
 stages:
+  - prepare
   - build
   - publish
   - deliver
-  - deploy
   - test
   - clear
 
@@ -11,35 +15,26 @@ variables:
   BIN_REPO_SVR_PATH: "C:\\Users\\commonuser\\Documents\\mss-academy-projects\\specialization\\bin_repo_svr"
 
 
+
 copy_to_local_folder:
-  stage: build
+  stage: prepare
   
   script:
     - Write-Host "Executing copy"
-    - $match = $env:CI_COMMIT_REF_NAME -match "^r_jsb_\d+_\d+$"
     - |
       if (Test-Path "$BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME") {
         Remove-Item -Path "$BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME" -Recurse -Force;
-        New-Item -Path "$BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME" -ItemType Directory -Force;
       }
     - |
-      if ($match) {
-        if (Test-Path "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME") {
-          Remove-Item -Path "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME" -Recurse -Force;
-        }
-        New-Item -Path "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME" -ItemType Directory -Force;
-        Copy-Item -Path "$env:CI_PROJECT_DIR\*" -Destination "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME" -Recurse;
-      } else {
-        Write-Host "Branch name does not match the pattern. Skipping...";
-        exit 1;
+      if (Test-Path "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME") {
+        Remove-Item -Path "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME" -Recurse -Force;
       }
-  only:
-    - /^r_jsb_\d+_\d+$/
+      New-Item -Path "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME" -ItemType Directory -Force;
+      Copy-Item -Path "$env:CI_PROJECT_DIR\*" -Destination "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME" -Recurse;
 
 build_jar_file:
   stage: build
-  before_script:
-    - $ARTIFACT_PATH="${BUILD_SVR_PATH}\${env:CI_COMMIT_REF_NAME}\target\*.jar"
+
   script:
     - cd "$BUILD_SVR_PATH\\$env:CI_COMMIT_REF_NAME"
     - "& $BUILD_SVR_PATH\\$env:CI_COMMIT_REF_NAME\\build\\build.ps1"
@@ -48,9 +43,6 @@ build_jar_file:
         Remove-Item -Path "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME\$env:CI_COMMIT_REF_NAME.tar" -Force
       }
     - tar -cf "$env:CI_COMMIT_REF_NAME.tar" "bin" "deploy" "config" "test"
-  artifacts:
-    paths:
-      - $ARTIFACT_PATH
  
 copy_to_bin_repo:
   stage: publish
@@ -108,5 +100,4 @@ clear_folders:
   stage: clear
   script:
     - ssh "$($env:REMOTE_USER)@$($env:REMOTE_HOST)" "Remove-Item -Path 'C:\Users\l1ds\group1\$($env:CI_COMMIT_REF_NAME)' -Recurse -Force;"
-      
   allow_failure: true
