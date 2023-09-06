@@ -77,8 +77,6 @@ untar:
 functional_testing:
   stage: test
   script:
-    - Write-Host $($env:L1DS_SQL_USER)
-    - Write-Host $($env:L1DS_SQL_PASSWORD)
     - |
       echo "DELETE FROM tmsappdb.accgroup WHERE groupName='project lead';" | ssh -vvv l1ds@192.168.0.2 "mysql -u $($env:L1DS_SQL_USER) -p$($env:L1DS_SQL_PASSWORD)"
     - ssh "$($env:REMOTE_USER)@$($env:REMOTE_HOST)" C:\Users\l1ds\group1\$($env:CI_COMMIT_REF_NAME)\test\test.ps1
