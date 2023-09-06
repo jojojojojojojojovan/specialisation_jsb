@@ -74,11 +74,11 @@ untar:
   needs:
     - setup_ssh
 
-integration_testing:
+functional_testing:
   stage: test
   script:
     - |
-      echo "DELETE FROM tmsappdb.accgroup WHERE groupName='project lead';" | ssh l1ds@192.168.0.2 "mysql -u root -ppassword"
+      echo "DELETE FROM tmsappdb.accgroup WHERE groupName='project lead';" | ssh l1ds@192.168.0.2 "mysql -u $($env:L1DS_SQL_USER) -p$($env:L1DS_SQL_PASSWORD)"
     - ssh "$($env:REMOTE_USER)@$($env:REMOTE_HOST)" C:\Users\l1ds\group1\$($env:CI_COMMIT_REF_NAME)\test\test.ps1
 
 clear_docker:
