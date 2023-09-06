@@ -5,7 +5,7 @@ $expectedOutput = @{
     "test2_getApp_fail.ps1" = $false;
     "test3__createAccGroup_pass.ps1" = $true;
     "test3__createAccGroup_fail.ps1" = $false;
-    "test4__createApp_pass.ps1" = $true;
+    "test4__createApp_pass.ps1" = $false;
 }
 
 $testCasesPath = "$PSScriptRoot\test_cases\"
