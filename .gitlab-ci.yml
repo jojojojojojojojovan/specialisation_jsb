@@ -1,7 +1,9 @@
+#Start the pipeline if regex match
 workflow:
   rules:
     - if: $CI_COMMIT_REF_NAME =~ /^r_jsb_\d+_\d+$/
 
+#Stage sequence 
 stages:
   - prepare
   - build
@@ -10,6 +12,7 @@ stages:
   - test
   - clear
 
+#Define Build & Bin paths
 variables:
   BUILD_SVR_PATH: "C:\\Users\\commonuser\\Documents\\mss-academy-projects\\specialization\\build_svr"
   BIN_REPO_SVR_PATH: "C:\\Users\\commonuser\\Documents\\mss-academy-projects\\specialization\\bin_repo_svr"
@@ -22,13 +25,16 @@ copy_to_local_folder:
   script:
     - Write-Host "Executing copy"
     - |
+      #remove path if exist 
       if (Test-Path "$BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME") {
         Remove-Item -Path "$BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME" -Recurse -Force;
       }
     - |
+      #remove path if exist
       if (Test-Path "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME") {
         Remove-Item -Path "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME" -Recurse -Force;
       }
+      #create working dir in Build server and copy folder to working dir 
       New-Item -Path "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME" -ItemType Directory -Force;
       Copy-Item -Path "$env:CI_PROJECT_DIR\*" -Destination "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME" -Recurse;
 
@@ -36,27 +42,34 @@ build_jar_file:
   stage: build
 
   script:
+    # change directory to Build server working dir & invoke build.ps1
     - cd "$BUILD_SVR_PATH\\$env:CI_COMMIT_REF_NAME"
     - "& $BUILD_SVR_PATH\\$env:CI_COMMIT_REF_NAME\\build\\build.ps1"
     - |
+      # remove tar file if it exist in Build server working dir
       if(Test-Path "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME\$env:CI_COMMIT_REF_NAME.tar") {
         Remove-Item -Path "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME\$env:CI_COMMIT_REF_NAME.tar" -Force
       }
+      # tar the required folders
     - tar -cf "$env:CI_COMMIT_REF_NAME.tar" "bin" "deploy" "config" "test"
  
 copy_to_bin_repo:
   stage: publish
   script:
     - |
+      # remove tar if it exist in Bin server working dir
       if(Test-Path "$BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME\$env:CI_COMMIT_REF_NAME.tar") {
         Remove-Item -Path "$BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME\$env:CI_COMMIT_REF_NAME.tar";
       }
+      # create a new working dir based on the release label in Bin server and copy tar from the Build to Bin working dir
     - New-Item -Path "$BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME" -ItemType Directory -Force;
     - Copy-Item -Path "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME\$env:CI_COMMIT_REF_NAME.tar" -Destination "$BIN_REPO_SVR_PATH\$env:CI_COMMIT_REF_NAME\$env:CI_COMMIT_REF_NAME.tar";
+      # list the content of the tar
     - tar -tf "$BUILD_SVR_PATH\$env:CI_COMMIT_REF_NAME\$env:CI_COMMIT_REF_NAME.tar";
 
 setup_ssh:
   stage: deliver
+  # secure copy protocol the tar from the Bin working dir into l1ds group1 folder
   script:
     # - $env:SSH_AUTH_SOCK = Start-Service ssh-agent
     # - Set-Content -Path C:\Users\commonuser\.ssh\gitlab-ci -Value $env:SSH_PRIVATE_KEY
@@ -68,6 +81,7 @@ untar:
   stage: deliver
   script:
     - |
+      # create a new working dir in l1ds based on the release label and extract the tar into the working dir. Run the deploy.ps1
       ssh "$($env:REMOTE_USER)@$($env:REMOTE_HOST)" "New-Item -Path 'C:\Users\l1ds\group1\$($env:CI_COMMIT_REF_NAME)' -ItemType Directory -Force;
       tar -xvf 'C:\Users\l1ds\group1\$($env:CI_COMMIT_REF_NAME).tar' -C 'C:\Users\l1ds\group1\$($env:CI_COMMIT_REF_NAME)';
       powershell -command 'C:\Users\l1ds\group1\$($env:CI_COMMIT_REF_NAME)\deploy\deploy.ps1' -CI_COMMIT_REF_NAME ${CI_COMMIT_REF_NAME};"
@@ -78,12 +92,14 @@ integration_testing:
   stage: test
   script:
     - |
+      # delete project lead group from db and run test.ps1
       echo "DELETE FROM tmsappdb.accgroup WHERE groupName='project lead';" | ssh l1ds@192.168.0.2 "mysql -u root -ppassword"
     - ssh "$($env:REMOTE_USER)@$($env:REMOTE_HOST)" C:\Users\l1ds\group1\$($env:CI_COMMIT_REF_NAME)\test\test.ps1
 
 clear_docker:
   stage: clear
   script:
+    # stop docker container, remove docker container and remove docker image 
     - ssh "$($env:REMOTE_USER)@$($env:REMOTE_HOST)" "docker stop $($env:CI_COMMIT_REF_NAME)"
     - ssh "$($env:REMOTE_USER)@$($env:REMOTE_HOST)" "docker rm $($env:CI_COMMIT_REF_NAME)"
     - ssh "$($env:REMOTE_USER)@$($env:REMOTE_HOST)" "docker rmi $($env:CI_COMMIT_REF_NAME)"
@@ -99,5 +115,6 @@ clear_docker:
 clear_folders:
   stage: clear
   script:
+    # delete the l1ds working dir
     - ssh "$($env:REMOTE_USER)@$($env:REMOTE_HOST)" "Remove-Item -Path 'C:\Users\l1ds\group1\$($env:CI_COMMIT_REF_NAME)' -Recurse -Force;"
   allow_failure: true
