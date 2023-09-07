@@ -619,7 +619,7 @@ public class TaskService {
         System.out.println("email " + email);
 
         if(task.getTaskState().toLowerCase().equals("done")){
-            emailService.sendEmail(email, "Promote task " + req.get("taskId").toString() +" to done", "Promote task " + req.get("taskId").toString() +" to done");
+            emailService.sendEmail(email, "Task " + req.get("taskId").toString() + " promoted, pending review",username + " promoted task " + req.get("taskId").toString() +" from doing to done. Please review. System generted email. Do not reply");
 
             response.put("success", true);
             return response;

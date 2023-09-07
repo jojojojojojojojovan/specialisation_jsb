@@ -27,7 +27,7 @@ public class AccgroupController {
     @Autowired
     AccgroupService accGroupService;
 
-    @PostMapping(path = "/createAccGroup")
+    @PostMapping(path = "/createAccGroup", name = "security.enabled")
     public ResponseEntity<Map<String, Object>> createAccGroup(@RequestBody Map<String, Object> req) {
         Map<String, Object> result = new HashMap<>();
         result = accGroupService.createAccgroup(req);

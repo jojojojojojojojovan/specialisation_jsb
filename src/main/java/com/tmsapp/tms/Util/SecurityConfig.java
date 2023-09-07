@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -18,24 +20,19 @@ import org.springframework.security.web.authentication.logout.LogoutSuccessHandl
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import com.tmsapp.tms.Entity.JwtInvalidation;
 import com.tmsapp.tms.Repository.JwtRepository;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
 
 
 
 
 @Configuration
 @EnableWebSecurity
-@AllArgsConstructor
 public class SecurityConfig{
 
     @Autowired
@@ -51,6 +48,7 @@ public class SecurityConfig{
     CustomLogoutHandler customLogoutHandler;
 
     @Bean
+    @ConditionalOnProperty(name = "security.enabled", havingValue = "true")
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         AuthenticationFilter authenticationFilter = new AuthenticationFilter(customAuthenticationManager);
         authenticationFilter.setFilterProcessesUrl("/login");
@@ -83,6 +81,21 @@ public class SecurityConfig{
                             response.addCookie(deleteJwtCookie);
                     }
                 }));
+
+        return http.build();
+    }
+
+    @Bean
+    @ConditionalOnProperty(name = "security.enabled", havingValue = "false")
+    public SecurityFilterChain filterChainNoSecurity(HttpSecurity http) throws Exception {
+        AuthenticationFilter authenticationFilter = new AuthenticationFilter(customAuthenticationManager);
+        authenticationFilter.setFilterProcessesUrl("/login");
+        http
+                .csrf(csrf -> csrf.disable())
+                .cors(Customizer.withDefaults())
+                .authorizeHttpRequests(auth -> auth
+                                .anyRequest().permitAll()
+                );
 
         return http.build();
     }

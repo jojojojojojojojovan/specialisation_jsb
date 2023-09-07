@@ -45,7 +45,7 @@ public class AuthenticationController {
     }
 
     @PostMapping(path= "/cg")
-    public ResponseEntity<Map<String, Object>> checkGroup(@RequestBody Map<String, Object> req, @CookieValue("authToken") String jwtToken) {
+    public ResponseEntity<Map<String, Object>> checkGroup(@RequestBody Map<String, Object> req) {
         Map<String, Object> result = new HashMap<>();
         System.out.println("testing\n");
 
