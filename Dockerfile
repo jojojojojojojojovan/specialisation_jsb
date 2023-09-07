@@ -1,4 +1,4 @@
-# Use the official maven/Java 8 image to create a build-time image
+# Use the official maven/Java 8 image to create a build-time images
 FROM maven:3.6.0-jdk-8 as builder
 
 # Set the current working directory inside the image
