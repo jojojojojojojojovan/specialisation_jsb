@@ -21,7 +21,7 @@ public class ApplicationController {
     @Autowired
     private ApplicationService applicationService;
 
-    //INPUT: appAcronym
+    //INPUT: appAcronym and others
     @PostMapping("/getApplication")
     public ResponseEntity<Map<String, Object>> getApplication(@RequestBody Map<String, Object> req) {
         Map<String, Object> response = new HashMap<>();
