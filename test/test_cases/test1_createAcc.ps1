@@ -23,7 +23,7 @@ $jsonBody = $body | ConvertTo-Json -Depth 10
 
 # Setting up the Cookie as a Web Session
 $webSession = New-Object Microsoft.PowerShell.Commands.WebRequestSession
-$authTokenValue = "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImlwIjoiMDowOjA6MDowOjA6MDoxIiwidXNlckFnZW50IjoiTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzExNi4wLjAuMCBTYWZhcmkvNTM3LjM2IiwiZXhwIjoxNjkzOTY1MDUyfQ.hQofVbmCnXQsKdlSftssUhZWnUVKVD2vft3h9u0yUvAKBVjwZaHrS2aFZcCFe92VotWhBfeccSP74DKq2ljbgw"
+$authTokenValue = "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImlwIjoiMDowOjA6MDowOjA6MDoxIiwidXNlckFnZW50IjoiUG9zdG1hblJ1bnRpbWUvNy4zMi4zIiwiZXhwIjoxNjk0MTUxNDA5fQ.tXOVS0MDb2sWQZXYnrmJlvGYuUzFbxCYzCkEDUu74jDWddRrJE5ymMXE2MAt3Wy-qr-zjunzUubczUWrxU3mBA"
 $webSession.Cookies.Add((New-Object System.Net.Cookie("authToken", $authTokenValue, "/", "localhost")))
 
 # Make the REST API call using Invoke-RestMethod
