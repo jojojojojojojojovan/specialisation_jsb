@@ -1,24 +1,15 @@
 package com.tmsapp.tms.Util;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.stereotype.Component;
-import org.springframework.util.StreamUtils;
-import org.springframework.web.bind.annotation.CrossOrigin;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.tmsapp.tms.Entity.Account;
@@ -29,7 +20,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -37,24 +27,12 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter{
     
     private CustomAuthenticationManager customAuthenticationManager;
 
-
     @Override
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
 			throws AuthenticationException {
-
                 try{
-                    // try (InputStream inputStream = request.getInputStream();
-                    //     BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
-                    //     String line;
-                    //     while ((line = reader.readLine()) != null) {
-                    //         System.out.println(line);
-                    //     }
-                    // }
-                    // ObjectMapper objectMapper = new ObjectMapper();
-                    // JsonNode jsonNode = objectMapper.readTree(request.getInputStream());
-                    // System.out.println(jsonNode);
+                    System.out.println("ABC");
                     Account account = new ObjectMapper().readValue(request.getInputStream(), Account.class);
-                    // System.out.println(account.getUsername());
                     Authentication authentication = new UsernamePasswordAuthenticationToken(account.getUsername(), account.getPassword());
                     return customAuthenticationManager.authenticate(authentication);
                 }catch(IOException e){

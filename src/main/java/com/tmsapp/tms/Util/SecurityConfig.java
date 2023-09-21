@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -27,9 +28,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
-
-
 
 @Configuration
 @EnableWebSecurity
@@ -50,19 +48,26 @@ public class SecurityConfig{
     @Bean
     @ConditionalOnProperty(name = "security.enabled", havingValue = "true")
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        
         AuthenticationFilter authenticationFilter = new AuthenticationFilter(customAuthenticationManager);
+        AuthorizationFilter authorizationFilter = new AuthorizationFilter("admin",customAuthenticationManager);
         authenticationFilter.setFilterProcessesUrl("/login");
         http
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                                .requestMatchers("/api/accounts/*").permitAll()
-                                .anyRequest().authenticated()
-                )
+                    //.requestMatchers("/api")
+                    //.requestMatchers("/admin/*")
+                    //.requestMatchers("/pl/*").checkgroup("PL")
+                    //.requestMatchers("/pl/*").checkgroup("PL")
+                    .anyRequest().authenticated()
+                )                
                 .addFilterBefore(new ExceptionFilter(), AuthenticationFilter.class)
                 .addFilter(authenticationFilter)
                 .addFilterAfter(jwtAuthorizationFilter, AuthenticationFilter.class)
+                .addFilterAfter(authorizationFilter,AuthenticationFilter.class)
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
                 .logout(logout -> logout
                 .addLogoutHandler(customLogoutHandler)
                 .logoutSuccessHandler(new LogoutSuccessHandler() {
